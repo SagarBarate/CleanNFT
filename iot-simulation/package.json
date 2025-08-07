@@ -1,0 +1,23 @@
+{
+  "name": "iot-simulation",
+  "version": "1.0.0",
+  "description": "IoT Edge Layer Simulation for Recycling Badge System",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start-local": "node index-local.js",
+    "simulate": "node simulate-dropoff.js",
+    "simulate-local": "node test-dropoff-local.js",
+    "test": "node test-sensors.js",
+    "test-local": "node test-dropoff-local.js"
+  },
+  "dependencies": {
+    "mqtt": "^5.3.5",
+    "aws-sdk": "^2.1550.0",
+    "dotenv": "^16.4.1",
+    "uuid": "^9.0.1"
+  },
+  "keywords": ["iot", "simulation", "recycling", "aws"],
+  "author": "Your Name",
+  "license": "MIT"
+}
