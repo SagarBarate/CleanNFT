@@ -19,3 +19,9 @@ echo 🎯 Now try:
 echo expo start --tunnel
 echo.
 pause
+
+
+
+
+
+

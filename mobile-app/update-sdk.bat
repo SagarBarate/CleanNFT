@@ -30,3 +30,9 @@ echo 📱 Make sure to:
 echo - Update Expo Go app on your iPhone
 echo - Connect to the same WiFi network
 pause
+
+
+
+
+
+

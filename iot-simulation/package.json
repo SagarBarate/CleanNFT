@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "start-local": "node index-local.js",
+    
     "simulate": "node simulate-dropoff.js",
     "simulate-local": "node test-dropoff-local.js",
     "test": "node test-sensors.js",

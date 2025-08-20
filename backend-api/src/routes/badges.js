@@ -18,3 +18,6 @@ router.post('/:id/claim', [
 router.get('/user/:userId', BadgeController.getUserBadges);
 
 module.exports = router;
+
+
+

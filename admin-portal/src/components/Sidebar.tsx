@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  Recycle as RecycleIcon,
+  Recycling as RecycleIcon,
   People as PeopleIcon,
   Token as TokenIcon,
 } from '@mui/icons-material';

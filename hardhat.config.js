@@ -29,6 +29,12 @@ module.exports = {
     mumbai: {
       url: process.env.MUMBAI_RPC,
       accounts: [process.env.PRIVATE_KEY],
+      chainId: 80002, // Amoy testnet
+    },
+    amoy: {
+      url: process.env.MUMBAI_RPC,
+      accounts: [process.env.PRIVATE_KEY],
+      chainId: 80002, // Amoy testnet
     },
   },
 };

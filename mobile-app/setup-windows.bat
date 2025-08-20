@@ -55,3 +55,9 @@ echo - Install Expo Go app on your iPhone
 echo - Connect to the same WiFi network
 echo - Try mobile hotspot if WiFi fails
 pause
+
+
+
+
+
+

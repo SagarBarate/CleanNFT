@@ -53,7 +53,7 @@ const BinManagement: React.FC = () => {
       const mockBins: Bin[] = [
         {
           id: 'BIN-001',
-          location: 'Central Park - Main Entrance',
+          location: 'Central Park - Main Entrance Athlone',
           status: 'active',
           bottlesRecycled: 150,
           totalPoints: 7500,
@@ -325,7 +325,6 @@ const BinManagement: React.FC = () => {
                 value={selectedBin.qrCodeData}
                 size={256}
                 level="H"
-                includeMargin={true}
               />
             )}
           </Box>

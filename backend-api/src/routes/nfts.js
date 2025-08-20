@@ -28,3 +28,6 @@ router.put('/:id', NFTController.updateNFT);
 router.delete('/:id', NFTController.deleteNFT);
 
 module.exports = router;
+
+
+

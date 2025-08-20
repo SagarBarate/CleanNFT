@@ -56,3 +56,9 @@ echo 5. Start mobile app: cd mobile-app ^&^& npm start
 echo.
 echo 📚 Check README.md for detailed documentation
 pause
+
+
+
+
+
+

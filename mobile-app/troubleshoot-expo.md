@@ -158,3 +158,9 @@ npx expo install --fix
 - [ ] Restart development machine
 - [ ] Try different network (mobile hotspot)
 - [ ] Update Expo CLI: `npm install -g @expo/cli@latest`
+
+
+
+
+
+

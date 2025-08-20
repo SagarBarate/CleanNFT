@@ -66,3 +66,9 @@ Write-Host "- Connect to the same WiFi network" -ForegroundColor White
 Write-Host "- Try mobile hotspot if WiFi fails" -ForegroundColor White
 Write-Host ""
 Read-Host "Press Enter to continue"
+
+
+
+
+
+

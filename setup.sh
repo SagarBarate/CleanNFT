@@ -56,3 +56,9 @@ echo "4. Start admin portal: cd admin-portal && npm start"
 echo "5. Start mobile app: cd mobile-app && npm start"
 echo ""
 echo "📚 Check README.md for detailed documentation"
+
+
+
+
+
+

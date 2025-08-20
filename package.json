@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:mumbai": "cd contracts && npx hardhat run scripts/deploy-mumbai.js --network mumbai",
+    "verify:mumbai": "cd contracts && npx hardhat run scripts/verify-mumbai.js --network mumbai",
+    "test:contract": "cd contracts && npx hardhat test test/test-mumbai.js",
+    "compile": "cd contracts && npx hardhat compile",
+    "clean": "cd contracts && npx hardhat clean"
   },
   "keywords": [],
   "author": "",
