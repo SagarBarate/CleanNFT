@@ -46,7 +46,7 @@ export const BLOCKCHAIN_CONFIG = {
       symbol: 'RCB',
       description: 'Recycling Badge NFT Collection',
           // Update this with your deployed contract address
-    address: process.env.REACT_APP_CONTRACT_ADDRESS || '0x9732e6BB31742f9FA4fd650cE20aD595983B3651',
+    address: import.meta.env.VITE_CONTRACT_ADDRESS || '0x9732e6BB31742f9FA4fd650cE20aD595983B3651',
     }
   },
 
@@ -62,8 +62,8 @@ export const BLOCKCHAIN_CONFIG = {
     GATEWAY: 'https://ipfs.io/ipfs/',
     PINATA_API_URL: 'https://api.pinata.cloud',
     // Add your Pinata API keys here for production
-    PINATA_API_KEY: process.env.REACT_APP_PINATA_API_KEY || '',
-    PINATA_SECRET_KEY: process.env.REACT_APP_PINATA_SECRET_KEY || '',
+    PINATA_API_KEY: import.meta.env.VITE_PINATA_API_KEY || '',
+    PINATA_SECRET_KEY: import.meta.env.VITE_PINATA_SECRET_KEY || '',
   },
 
   // App Configuration

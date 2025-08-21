@@ -22,3 +22,6 @@ const RecycleIcon: React.FC<RecycleIconProps> = ({ size = 24, color = 'currentCo
 
 export default RecycleIcon;
 
+
+
+

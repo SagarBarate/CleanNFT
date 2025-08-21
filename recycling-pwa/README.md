@@ -36,6 +36,27 @@ A Progressive Web App (PWA) for incentivizing recycling through gamification, ba
 - Manages background sync
 - Processes push notifications
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### "process is not defined" Error
+- **Cause**: Using Node.js environment variables in browser
+- **Solution**: Use `VITE_` prefix instead of `REACT_APP_` for environment variables
+- **Example**: `VITE_CONTRACT_ADDRESS` instead of `REACT_APP_CONTRACT_ADDRESS`
+
+#### White Screen on Load
+- **Cause**: JavaScript errors preventing app initialization
+- **Solution**: Check browser console for errors and ensure environment variables are properly set
+
+#### Contract Connection Issues
+- **Cause**: Invalid or missing contract address
+- **Solution**: Verify your contract address in the `.env` file and ensure it's deployed on the correct network
+
+#### MetaMask Connection Problems
+- **Cause**: Wrong network or MetaMask not installed
+- **Solution**: Ensure MetaMask is installed and connected to Polygon Amoy or Mumbai testnet
+
 ### Web App Manifest
 - App icons in multiple sizes
 - Splash screen configuration
@@ -67,17 +88,33 @@ A Progressive Web App (PWA) for incentivizing recycling through gamification, ba
    npm install
    ```
 
-3. **Start development server**
+3. **Environment Setup**
+   Create a `.env` file in the root directory with the following variables:
+   ```bash
+   # Blockchain Configuration
+   VITE_CONTRACT_ADDRESS=your_deployed_contract_address_here
+   
+   # IPFS/Pinata Configuration (optional)
+   VITE_PINATA_API_KEY=your_pinata_api_key_here
+   VITE_PINATA_SECRET_KEY=your_pinata_secret_key_here
+   ```
+   
+   **Important Notes:**
+   - Use `VITE_` prefix for all environment variables (not `REACT_APP_`)
+   - If you don't have a deployed contract, the app will use a placeholder address
+   - The app will work for basic functionality even without a valid contract address
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-4. **Build for production**
+5. **Build for production**
    ```bash
    npm run build
    ```
 
-5. **Preview production build**
+6. **Preview production build**
    ```bash
    npm run preview
    ```

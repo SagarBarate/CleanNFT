@@ -1,60 +1,65 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("🚀 Deploying RecyclingBadge contract to Mumbai testnet...");
+  console.log("Deploying RecyclingNFT contract to Mumbai testnet...");
 
   // Get the contract factory
-  const RecyclingBadge = await ethers.getContractFactory("RecyclingBadge");
-  
-  console.log("📝 Contract factory created");
+  const RecyclingNFT = await ethers.getContractFactory("RecyclingNFT");
+
+  // Contract parameters
+  const name = "Recycling Rewards NFT";
+  const symbol = "RRNFT";
+  const maxClaimableNFTs = 1000; // Maximum NFTs that can be claimed
 
   // Deploy the contract
-  const recyclingBadge = await RecyclingBadge.deploy();
-  
-  console.log("⏳ Waiting for deployment...");
-  
+  const recyclingNFT = await RecyclingNFT.deploy(name, symbol, maxClaimableNFTs);
+
   // Wait for deployment to finish
-  await recyclingBadge.waitForDeployment();
-  
-  // Get the deployed contract address
-  const address = await recyclingBadge.getAddress();
-  
-  console.log("✅ RecyclingBadge deployed successfully!");
-  console.log("📍 Contract Address:", address);
-  console.log("🔗 Mumbai Polygonscan:", `https://mumbai.polygonscan.com/address/${address}`);
-  
+  await recyclingNFT.waitForDeployment();
+
+  const contractAddress = await recyclingNFT.getAddress();
+
+  console.log("RecyclingNFT deployed to:", contractAddress);
+  console.log("Contract name:", name);
+  console.log("Contract symbol:", symbol);
+  console.log("Max claimable NFTs:", maxClaimableNFTs.toString());
+
   // Verify the deployment
-  console.log("\n🔍 Verifying deployment...");
-  
-  try {
-    // Check if we can call a view function
-    const totalSupply = await recyclingBadge.getTotalSupply();
-    const nextTokenId = await recyclingBadge.getNextTokenId();
-    
-    console.log("✅ Contract verification successful!");
-    console.log("📊 Total Supply:", totalSupply.toString());
-    console.log("🆔 Next Token ID:", nextTokenId.toString());
-    
-  } catch (error) {
-    console.log("⚠️ Contract verification failed:", error.message);
-  }
-  
-  console.log("\n🎯 Next steps:");
-  console.log("1. Copy the contract address above");
-  console.log("2. Update your frontend configuration");
-  console.log("3. Test the contract on Mumbai testnet");
-  console.log("4. Get MATIC from the faucet if needed");
-  
-  return address;
+  console.log("\nVerifying deployment...");
+  console.log("Owner:", await recyclingNFT.owner());
+  console.log("Total minted NFTs:", (await recyclingNFT.getTotalMintedNFTs()).toString());
+  console.log("Remaining claimable NFTs:", (await recyclingNFT.getRemainingClaimableNFTs()).toString());
+
+  console.log("\nDeployment successful! 🎉");
+  console.log("Contract address:", contractAddress);
+  console.log("Network: Mumbai Testnet");
+  console.log("Explorer: https://mumbai.polygonscan.com/address/" + contractAddress);
+
+  // Save deployment info to a file
+  const fs = require('fs');
+  const deploymentInfo = {
+    contractName: "RecyclingNFT",
+    contractAddress: contractAddress,
+    network: "Mumbai Testnet",
+    chainId: 80001,
+    name: name,
+    symbol: symbol,
+    maxClaimableNFTs: maxClaimableNFTs,
+    deploymentTime: new Date().toISOString(),
+    explorer: `https://mumbai.polygonscan.com/address/${contractAddress}`
+  };
+
+  fs.writeFileSync(
+    'deployment-info-mumbai.json',
+    JSON.stringify(deploymentInfo, null, 2)
+  );
+
+  console.log("\nDeployment info saved to: deployment-info-mumbai.json");
 }
 
-// Handle errors
 main()
-  .then((address) => {
-    console.log("\n🎉 Deployment completed successfully!");
-    process.exit(0);
-  })
+  .then(() => process.exit(0))
   .catch((error) => {
-    console.error("❌ Deployment failed:", error);
+    console.error("Deployment failed:", error);
     process.exit(1);
   });

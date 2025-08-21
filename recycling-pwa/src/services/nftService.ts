@@ -1,247 +1,352 @@
 import { ethers } from 'ethers';
+import { BLOCKCHAIN_CONFIG } from '../config/blockchain';
+import { NFTMetadata } from './pinataService';
 
-export interface NFTMetadata {
-  name: string;
-  description: string;
-  image: string;
-  attributes: {
-    trait_type: string;
-    value: string;
-  }[];
-  external_url?: string;
-  animation_url?: string;
+// ABI for the RecyclingNFT contract
+const RECYCLING_NFT_ABI = [
+  // ERC721 functions
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function tokenURI(uint256 tokenId) view returns (string)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function getApproved(uint256 tokenId) view returns (address)",
+  "function isApprovedForAll(address owner, address operator) view returns (bool)",
+  
+  // Custom contract functions
+  "function mintNFT(address to, string memory tokenURI) public returns (uint256)",
+  "function batchMintNFTs(address to, string[] memory tokenURIs) public returns (uint256[])",
+  "function claimNFT(uint256 tokenId) public returns (bool)",
+  "function hasUserClaimed(address user) public view returns (bool)",
+  "function getRemainingClaimableNFTs() public view returns (uint256)",
+  "function getTotalMintedNFTs() public view returns (uint256)",
+  "function maxClaimableNFTs() public view returns (uint256)",
+  "function claimedNFTs() public view returns (uint256)",
+  "function updateTokenURI(uint256 tokenId, string memory newTokenURI) public",
+  "function setMaxClaimableNFTs(uint256 _maxClaimable) public",
+  
+  // Events
+  "event NFTMinted(uint256 indexed tokenId, address indexed to, string tokenURI)",
+  "event NFTClaimed(uint256 indexed tokenId, address indexed from, address indexed to)",
+  "event MetadataUpdated(uint256 indexed tokenId, string newTokenURI)",
+  
+  // Transfer events
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
+  "event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)",
+  "event ApprovalForAll(address indexed owner, address indexed operator, bool approved)"
+];
+
+export interface NFTInfo {
+  tokenId: number;
+  owner: string;
+  tokenURI: string;
+  metadata?: NFTMetadata;
 }
 
-export interface MintingResult {
-  success: boolean;
-  tokenId?: number;
-  transactionHash?: string;
-  tokenURI?: string;
-  error?: string;
+export interface ContractInfo {
+  name: string;
+  symbol: string;
+  totalMinted: number;
+  maxClaimable: number;
+  claimed: number;
+  remaining: number;
 }
 
 export class NFTService {
-  private static instance: NFTService;
-  
-  private constructor() {}
-  
-  static getInstance(): NFTService {
-    if (!NFTService.instance) {
-      NFTService.instance = new NFTService();
-    }
-    return NFTService.instance;
+  private provider: ethers.BrowserProvider | null = null;
+  private signer: ethers.JsonRpcSigner | null = null;
+  private contract: ethers.Contract | null = null;
+  private contractAddress: string;
+
+  constructor() {
+    this.contractAddress = BLOCKCHAIN_CONFIG.CONTRACTS.RECYCLING_BADGE.address;
   }
 
   /**
-   * Create NFT metadata for recycling achievements
+   * Initialize the service with a provider and signer
    */
-  createRecyclingMetadata(
-    name: string,
-    description: string,
-    rarity: 'common' | 'rare' | 'epic' | 'legendary',
-    category: string,
-    points: number,
-    bottlesRecycled: number
-  ): NFTMetadata {
-    return {
-      name,
-      description,
-      image: this.getDefaultImage(rarity),
-      attributes: [
-        {
-          trait_type: 'Rarity',
-          value: rarity.charAt(0).toUpperCase() + rarity.slice(1)
-        },
-        {
-          trait_type: 'Category',
-          value: category
-        },
-        {
-          trait_type: 'Points Required',
-          value: points.toString()
-        },
-        {
-          trait_type: 'Bottles Recycled',
-          value: bottlesRecycled.toString()
-        },
-        {
-          trait_type: 'Minted Date',
-          value: new Date().toISOString().split('T')[0]
-        }
-      ],
-      external_url: 'https://recycling-rewards-app.com',
-    };
-  }
+  async initialize(): Promise<void> {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      try {
+        // Request account access
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        // Create provider and signer
+        this.provider = new ethers.BrowserProvider(window.ethereum);
+        this.signer = await this.provider.getSigner();
+        
+        // Create contract instance
+        this.contract = new ethers.Contract(
+          this.contractAddress,
+          RECYCLING_NFT_ABI,
+          this.signer
+        );
 
-  /**
-   * Get default emoji/image based on rarity
-   */
-  private getDefaultImage(rarity: string): string {
-    switch (rarity) {
-      case 'common':
-        return '🌱';
-      case 'rare':
-        return '🌿';
-      case 'epic':
-        return '🌳';
-      case 'legendary':
-        return '🌍';
-      default:
-        return '♻️';
+        console.log('NFT Service initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize NFT Service:', error);
+        throw new Error('Failed to connect to MetaMask');
+      }
+    } else {
+      throw new Error('MetaMask not detected');
     }
   }
 
   /**
-   * Convert metadata to JSON string
+   * Check if the service is initialized
    */
-  metadataToJSON(metadata: NFTMetadata): string {
-    return JSON.stringify(metadata, null, 2);
+  isInitialized(): boolean {
+    return !!(this.provider && this.signer && this.contract);
   }
 
   /**
-   * For now, we'll use a mock IPFS service
-   * In production, you'd integrate with Pinata, Infura, or other IPFS services
+   * Get the current signer address
    */
-  async uploadToIPFS(metadata: NFTMetadata): Promise<string> {
-    // Mock IPFS upload - replace with real IPFS service
-    const mockIPFSHash = `ipfs://Qm${Math.random().toString(36).substring(2, 15)}`;
-    
-    // Simulate upload delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Mock IPFS upload:', {
-      metadata,
-      ipfsHash: mockIPFSHash
-    });
-    
-    return mockIPFSHash;
+  async getSignerAddress(): Promise<string> {
+    if (!this.signer) {
+      throw new Error('Service not initialized');
+    }
+    return await this.signer.getAddress();
   }
 
   /**
-   * Mint NFT using the smart contract
+   * Get contract information
    */
-  async mintNFT(
-    contract: ethers.Contract,
-    signer: ethers.Signer,
-    tokenURI: string
-  ): Promise<MintingResult> {
+  async getContractInfo(): Promise<ContractInfo> {
+    if (!this.contract) {
+      throw new Error('Service not initialized');
+    }
+
     try {
-      // Estimate gas
-      const gasEstimate = await contract.mintBadge.estimateGas(
-        await signer.getAddress(),
-        tokenURI
-      );
-
-      // Get current gas price
-      const gasPrice = await contract.runner?.provider?.getFeeData();
-      
-      console.log('Gas estimation:', {
-        gasLimit: gasEstimate.toString(),
-        gasPrice: gasPrice?.gasPrice?.toString()
-      });
-
-      // Mint the NFT
-      const tx = await contract.mintBadge(
-        await signer.getAddress(),
-        tokenURI,
-        {
-          gasLimit: gasEstimate.mul(120).div(100) // Add 20% buffer
-        }
-      );
-
-      // Wait for transaction confirmation
-      const receipt = await tx.wait();
-      
-      // Get the token ID from the event
-      const tokenId = await contract.getTotalSupply() - 1;
+      const [name, symbol, totalMinted, maxClaimable, claimed] = await Promise.all([
+        this.contract.name(),
+        this.contract.symbol(),
+        this.contract.getTotalMintedNFTs(),
+        this.contract.maxClaimableNFTs(),
+        this.contract.claimedNFTs()
+      ]);
 
       return {
-        success: true,
-        tokenId: tokenId.toNumber(),
-        transactionHash: receipt?.hash,
+        name,
+        symbol,
+        totalMinted: Number(totalMinted),
+        maxClaimable: Number(maxClaimable),
+        claimed: Number(claimed),
+        remaining: Number(maxClaimable) - Number(claimed)
+      };
+    } catch (error) {
+      console.error('Error getting contract info:', error);
+      throw new Error('Failed to get contract information');
+    }
+  }
+
+  /**
+   * Check if a user has already claimed an NFT
+   */
+  async hasUserClaimed(userAddress: string): Promise<boolean> {
+    if (!this.contract) {
+      throw new Error('Service not initialized');
+    }
+
+    try {
+      return await this.contract.hasUserClaimed(userAddress);
+    } catch (error) {
+      console.error('Error checking if user claimed:', error);
+      throw new Error('Failed to check user claim status');
+    }
+  }
+
+  /**
+   * Get NFT information by token ID
+   */
+  async getNFTInfo(tokenId: number): Promise<NFTInfo> {
+    if (!this.contract) {
+      throw new Error('Service not initialized');
+    }
+
+    try {
+      const [owner, tokenURI] = await Promise.all([
+        this.contract.ownerOf(tokenId),
+        this.contract.tokenURI(tokenId)
+      ]);
+
+      return {
+        tokenId,
+        owner,
         tokenURI
       };
-
     } catch (error) {
-      console.error('Minting failed:', error);
-      
-      let errorMessage = 'Unknown error occurred';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
-      return {
-        success: false,
-        error: errorMessage
-      };
+      console.error('Error getting NFT info:', error);
+      throw new Error('Failed to get NFT information');
     }
   }
 
   /**
-   * Get transaction status
+   * Get all NFTs owned by a specific address
    */
-  async getTransactionStatus(
-    provider: ethers.Provider,
-    txHash: string
-  ): Promise<{
-    status: 'pending' | 'confirmed' | 'failed';
-    confirmations: number;
-    blockNumber?: number;
-  }> {
+  async getNFTsByOwner(ownerAddress: string): Promise<NFTInfo[]> {
+    if (!this.contract) {
+      throw new Error('Service not initialized');
+    }
+
     try {
-      const receipt = await provider.getTransactionReceipt(txHash);
-      
-      if (!receipt) {
-        return {
-          status: 'pending',
-          confirmations: 0
-        };
+      const totalMinted = await this.contract.getTotalMintedNFTs();
+      const nfts: NFTInfo[] = [];
+
+      for (let i = 1; i <= totalMinted; i++) {
+        try {
+          const owner = await this.contract.ownerOf(i);
+          if (owner.toLowerCase() === ownerAddress.toLowerCase()) {
+            const tokenURI = await this.contract.tokenURI(i);
+            nfts.push({
+              tokenId: i,
+              owner,
+              tokenURI
+            });
+          }
+        } catch (error) {
+          // Skip tokens that don't exist or have errors
+          continue;
+        }
       }
 
-      if (receipt.status === 0) {
-        return {
-          status: 'failed',
-          confirmations: receipt.confirmations,
-          blockNumber: receipt.blockNumber
-        };
-      }
-
-      return {
-        status: 'confirmed',
-        confirmations: receipt.confirmations,
-        blockNumber: receipt.blockNumber
-      };
-
+      return nfts;
     } catch (error) {
-      console.error('Failed to get transaction status:', error);
-      return {
-        status: 'failed',
-        confirmations: 0
-      };
+      console.error('Error getting NFTs by owner:', error);
+      throw new Error('Failed to get NFTs by owner');
     }
   }
 
   /**
-   * Format MATIC balance
+   * Claim an NFT (only works if user hasn't claimed before)
    */
-  formatMATIC(balance: ethers.BigNumberish): string {
-    const balanceInEther = ethers.formatEther(balance);
-    return parseFloat(balanceInEther).toFixed(4);
+  async claimNFT(tokenId: number): Promise<ethers.ContractTransactionResponse> {
+    if (!this.contract) {
+      throw new Error('Service not initialized');
+    }
+
+    try {
+      // Check if user has already claimed
+      const signerAddress = await this.getSignerAddress();
+      const hasClaimed = await this.hasUserClaimed(signerAddress);
+      
+      if (hasClaimed) {
+        throw new Error('User has already claimed an NFT');
+      }
+
+      // Check if NFT is available for claiming
+      const owner = await this.contract.ownerOf(tokenId);
+      const contractOwner = await this.contract.owner();
+      
+      if (owner.toLowerCase() !== contractOwner.toLowerCase()) {
+        throw new Error('NFT is not available for claiming');
+      }
+
+      // Claim the NFT
+      const tx = await this.contract.claimNFT(tokenId);
+      return tx;
+    } catch (error) {
+      console.error('Error claiming NFT:', error);
+      throw new Error(`Failed to claim NFT: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**
-   * Get Mumbai testnet info
+   * Wait for a transaction to be mined
    */
-  getMumbaiInfo() {
-    return {
-      name: 'Mumbai Testnet',
-      chainId: 80001,
-      rpcUrl: 'https://rpc-mumbai.maticvigil.com',
-      explorer: 'https://mumbai.polygonscan.com',
-      faucet: 'https://faucet.polygon.technology/',
-      currency: 'MATIC'
-    };
+  async waitForTransaction(tx: ethers.ContractTransactionResponse): Promise<ethers.ContractTransactionReceipt> {
+    if (!this.provider) {
+      throw new Error('Service not initialized');
+    }
+
+    try {
+      return await tx.wait();
+    } catch (error) {
+      console.error('Error waiting for transaction:', error);
+      throw new Error('Transaction failed or timed out');
+    }
+  }
+
+  /**
+   * Get the current network
+   */
+  async getNetwork(): Promise<ethers.Network> {
+    if (!this.provider) {
+      throw new Error('Service not initialized');
+    }
+
+    try {
+      return await this.provider.getNetwork();
+    } catch (error) {
+      console.error('Error getting network:', error);
+      throw new Error('Failed to get network information');
+    }
+  }
+
+  /**
+   * Check if connected to Mumbai testnet
+   */
+  async isMumbaiNetwork(): Promise<boolean> {
+    try {
+      const network = await this.getNetwork();
+      return network.chainId === BigInt(80001); // Mumbai testnet
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Switch to Mumbai testnet
+   */
+  async switchToMumbai(): Promise<void> {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x13881' }], // Mumbai testnet in hex
+        });
+      } catch (switchError: any) {
+        // If the network doesn't exist, add it
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x13881',
+                chainName: 'Mumbai Testnet',
+                nativeCurrency: {
+                  name: 'MATIC',
+                  symbol: 'MATIC',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+                blockExplorerUrls: ['https://mumbai.polygonscan.com'],
+              },
+            ],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+    }
+  }
+
+  /**
+   * Get gas estimate for claiming an NFT
+   */
+  async estimateGasForClaim(tokenId: number): Promise<bigint> {
+    if (!this.contract) {
+      throw new Error('Service not initialized');
+    }
+
+    try {
+      const signerAddress = await this.getSignerAddress();
+      return await this.contract.claimNFT.estimateGas(tokenId, { from: signerAddress });
+    } catch (error) {
+      console.error('Error estimating gas:', error);
+      throw new Error('Failed to estimate gas for claim transaction');
+    }
   }
 }
 
-export default NFTService.getInstance();
+export default NFTService;

@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth';
 import { Web3Provider } from './contexts/Web3Context';
 import Layout from './components/Layout';
 import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import QRScannerScreen from './screens/QRScannerScreen';
 import BadgeScreen from './screens/BadgeScreen';
@@ -34,6 +35,12 @@ function App() {
             path="/login" 
             element={
               isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginScreen />
+            } 
+          />
+          <Route 
+            path="/signup" 
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupScreen />
             } 
           />
           <Route

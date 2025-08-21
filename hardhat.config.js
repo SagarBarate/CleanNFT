@@ -27,12 +27,12 @@ module.exports = {
   },
   networks: {
     mumbai: {
-      url: process.env.MUMBAI_RPC,
+      url: process.env.MUMBAI_RPC_URL || "https://rpc-mumbai.maticvigil.com",
       accounts: [process.env.PRIVATE_KEY],
-      chainId: 80002, // Amoy testnet
+      chainId: 80001, // Mumbai testnet
     },
     amoy: {
-      url: process.env.MUMBAI_RPC,
+      url: process.env.AMOY_RPC_URL || "https://polygon-amoy.g.alchemy.com/v2/BAXA8y1jcCe3ghxQhOyUg",
       accounts: [process.env.PRIVATE_KEY],
       chainId: 80002, // Amoy testnet
     },

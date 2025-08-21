@@ -27,15 +27,20 @@ const QRScannerScreen: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [scannerInitialized, setScannerInitialized] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
     // Start scanning automatically when component mounts
-    startScanning();
+    // Add a small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      startScanning();
+    }, 100);
     
     // Cleanup on unmount
     return () => {
+      clearTimeout(timer);
       stopScanning();
     };
   }, []);
@@ -47,28 +52,46 @@ const QRScannerScreen: React.FC = () => {
     setScannedData(null);
     setScanning(true);
     
-    // Initialize QR scanner
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      { 
-        fps: 10, 
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
-      },
-      false
-    );
+    // Ensure the DOM element exists before initializing scanner
+    const qrReaderElement = document.getElementById('qr-reader');
+    if (!qrReaderElement) {
+      console.error('QR reader element not found');
+      setError('Failed to initialize scanner. Please refresh the page.');
+      setScanning(false);
+      return;
+    }
+    
+    try {
+      // Initialize QR scanner
+      const scanner = new Html5QrcodeScanner(
+        "qr-reader",
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        },
+        false
+      );
 
-    scanner.render(
-      (decodedText) => {
-        handleQRCodeScanned(decodedText);
-        scanner.clear();
-      },
-      (error) => {
-        console.error('QR scan error:', error);
-        setError('Failed to initialize camera. Please check permissions.');
-        setScanning(false);
-      }
-    );
+      scanner.render(
+        (decodedText) => {
+          handleQRCodeScanned(decodedText);
+          scanner.clear();
+        },
+        (error) => {
+          console.error('QR scan error:', error);
+          setError('Failed to initialize camera. Please check permissions.');
+          setScanning(false);
+        }
+      );
+      
+      // Mark scanner as initialized
+      setScannerInitialized(true);
+    } catch (error) {
+      console.error('Scanner initialization error:', error);
+      setError('Failed to initialize scanner. Please try again.');
+      setScanning(false);
+    }
   };
 
   const handleQRCodeScanned = async (data: string) => {
@@ -103,10 +126,16 @@ const QRScannerScreen: React.FC = () => {
   const stopScanning = () => {
     setIsScanning(false);
     setScanning(false);
+    setScannerInitialized(false);
+    
     // Clear the scanner element
     const scannerElement = document.getElementById('qr-reader');
     if (scannerElement) {
-      scannerElement.innerHTML = '';
+      try {
+        scannerElement.innerHTML = '';
+      } catch (error) {
+        console.warn('Error clearing scanner element:', error);
+      }
     }
   };
 
@@ -183,6 +212,16 @@ const QRScannerScreen: React.FC = () => {
             {error && (
               <Alert severity="error" sx={{ mb: 3 }}>
                 {error}
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={resetScanner}
+                    startIcon={<ScannerIcon />}
+                  >
+                    Retry
+                  </Button>
+                </Box>
               </Alert>
             )}
             
@@ -196,7 +235,14 @@ const QRScannerScreen: React.FC = () => {
               }}
             />
             
-            {scanning && (
+            {scanning && !scannerInitialized && (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                <Typography variant="body2">Initializing camera...</Typography>
+              </Box>
+            )}
+            
+            {scanning && scannerInitialized && (
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                 <CircularProgress size={20} sx={{ mr: 1 }} />
                 <Typography variant="body2">Scanning...</Typography>
@@ -264,6 +310,16 @@ const QRScannerScreen: React.FC = () => {
             {error && (
               <Alert severity="error" sx={{ mb: 3 }}>
                 {error}
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={resetScanner}
+                    startIcon={<ScannerIcon />}
+                  >
+                    Retry
+                  </Button>
+                </Box>
               </Alert>
             )}
 

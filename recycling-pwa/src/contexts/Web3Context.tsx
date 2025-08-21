@@ -69,7 +69,7 @@ interface Web3ProviderProps {
 
 export const Web3Provider: React.FC<Web3ProviderProps> = ({ 
   children, 
-  contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS || '' 
+  contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS || '0x9732e6BB31742f9FA4fd650cE20aD595983B3651' 
 }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -128,12 +128,24 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
       const network = await provider.getNetwork();
       const chainId = network.chainId.toString();
 
-      setAccount(account);
-      setChainId(chainId);
-      setIsConnected(true);
+      // Ensure account is a valid string
+      if (typeof account === 'string' && account.length > 0) {
+        setAccount(account);
+        setChainId(chainId);
+        setIsConnected(true);
+      } else {
+        throw new Error('Invalid account received from wallet');
+      }
 
-      // Initialize contract
-      await initializeContract(provider);
+      // Initialize contract if we have a valid address
+      if (contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000') {
+        try {
+          await initializeContract(provider);
+        } catch (err) {
+          console.warn('Failed to initialize contract:', err);
+          // Contract initialization failure shouldn't prevent wallet connection
+        }
+      }
 
       // Check if we're on Amoy testnet (or Mumbai for compatibility)
       if (chainId !== '80002' && chainId !== '80001') {
@@ -178,11 +190,11 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
   // Mint NFT
   const mintNFT = async (tokenURI: string): Promise<ethers.ContractTransactionResponse> => {
     if (!contract) {
-      throw new Error('Contract not initialized');
+      throw new Error('Contract not initialized. Please ensure you have a valid contract address.');
     }
 
     if (!account) {
-      throw new Error('Wallet not connected');
+      throw new Error('Wallet not connected. Please connect your wallet first.');
     }
 
     try {
@@ -190,6 +202,9 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
       return tx;
     } catch (err) {
       console.error('Failed to mint NFT:', err);
+      if (err instanceof Error && err.message.includes('insufficient funds')) {
+        throw new Error('Insufficient funds for gas fees. Please ensure you have enough MATIC in your wallet.');
+      }
       throw err;
     }
   };
@@ -205,7 +220,12 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
       if (accounts.length === 0) {
         disconnectWallet();
       } else {
-        setAccount(accounts[0]);
+        const newAccount = accounts[0];
+        if (typeof newAccount === 'string' && newAccount.length > 0) {
+          setAccount(newAccount);
+        } else {
+          console.warn('Invalid account received in accountsChanged event');
+        }
       }
     };
 
@@ -237,12 +257,20 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
           const network = await provider.getNetwork();
           const chainId = network.chainId.toString();
 
-          setAccount(account);
-          setChainId(chainId);
-          setIsConnected(true);
+          // Ensure account is valid before setting state
+          if (typeof account === 'string' && account.length > 0) {
+            setAccount(account);
+            setChainId(chainId);
+            setIsConnected(true);
+          }
 
-          if (contractAddress) {
-            await initializeContract(provider);
+          if (contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000') {
+            try {
+              await initializeContract(provider);
+            } catch (err) {
+              console.warn('Failed to initialize contract:', err);
+              // Don't set error here as it's not critical for basic functionality
+            }
           }
         }
       } catch (err) {

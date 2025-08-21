@@ -34,7 +34,7 @@ const WalletConnect: React.FC = () => {
 
   const isAmoyNetwork = chainId === '80002';
   const isMumbaiNetwork = chainId === '80001';
-  const isCorrectNetwork = isConnected && (isAmoyNetwork || isMumbaiNetwork);
+  const isCorrectNetwork = isConnected && chainId && (isAmoyNetwork || isMumbaiNetwork);
 
   const handleConnect = async () => {
     try {
@@ -52,11 +52,18 @@ const WalletConnect: React.FC = () => {
     }
   };
 
-  const formatAddress = (address: string) => {
+  const formatAddress = (address: string | null | undefined) => {
+    if (!address || typeof address !== 'string') {
+      return 'No Address';
+    }
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const getNetworkName = (chainId: string) => {
+  const getNetworkName = (chainId: string | null | undefined) => {
+    if (!chainId) {
+      return 'Unknown Network';
+    }
+    
     switch (chainId) {
       case '1':
         return 'Ethereum Mainnet';
@@ -64,6 +71,8 @@ const WalletConnect: React.FC = () => {
         return 'Polygon Mainnet';
       case '80001':
         return 'Mumbai Testnet';
+      case '80002':
+        return 'Polygon Amoy Testnet';
       default:
         return `Chain ID: ${chainId}`;
     }
@@ -84,7 +93,7 @@ const WalletConnect: React.FC = () => {
         {/* Network Status */}
         <Chip
           icon={isCorrectNetwork ? <ConnectedIcon /> : <ErrorIcon />}
-          label={getNetworkName(chainId || '')}
+          label={getNetworkName(chainId)}
           color={isCorrectNetwork ? 'success' : 'error'}
           variant="outlined"
           size="small"
@@ -93,7 +102,7 @@ const WalletConnect: React.FC = () => {
         {/* Account Info */}
         <Chip
           icon={<WalletIcon />}
-          label={formatAddress(account || '')}
+          label={formatAddress(account)}
           color="primary"
           variant="outlined"
           size="small"
