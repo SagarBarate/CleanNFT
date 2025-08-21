@@ -10,7 +10,7 @@ This project consists of multiple interconnected components:
 - **Location**: `mobile-app/`
 - **Tech Stack**: React Native, Expo
 - **Features**: 
-  - QR code scanning for bin identification
+  - QR code scanning for bin identification and user login
   - NFT badge claiming
   - User dashboard
   - Real-time recycling tracking
