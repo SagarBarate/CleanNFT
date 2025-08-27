@@ -27,14 +27,14 @@ module.exports = {
   },
   networks: {
     mumbai: {
-      url: process.env.MUMBAI_RPC_URL || "https://rpc-mumbai.maticvigil.com",
+      url: process.env.MUMBAI_RPC_URL || "https://rpc.ankr.com/polygon_mumbai",
       accounts: [process.env.PRIVATE_KEY],
-      chainId: 80001, // Mumbai testnet
+      chainId: 80001, // Mumbai testnet (DEPRECATED)
     },
     amoy: {
-      url: process.env.AMOY_RPC_URL || "https://polygon-amoy.g.alchemy.com/v2/BAXA8y1jcCe3ghxQhOyUg",
+      url: process.env.AMOY_RPC_URL || "https://rpc-amoy.polygon.technology",
       accounts: [process.env.PRIVATE_KEY],
-      chainId: 80002, // Amoy testnet
+      chainId: 80002, // Amoy testnet (CURRENT)
     },
   },
 };

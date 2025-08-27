@@ -6,7 +6,7 @@ module.exports = {
   NETWORK: {
     name: 'Mumbai Testnet',
     chainId: 80001,
-    rpcUrl: 'https://rpc-mumbai.maticvigil.com',
+    rpcUrl: 'https://polygon-mumbai.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
     explorer: 'https://mumbai.polygonscan.com',
     currency: 'MATIC',
     faucet: 'https://faucet.polygon.technology/'
@@ -18,7 +18,7 @@ module.exports = {
     privateKey: process.env.PRIVATE_KEY || 'your_private_key_here',
     
     // Mumbai RPC URL
-    rpcUrl: process.env.MUMBAI_RPC || 'https://rpc-mumbai.maticvigil.com',
+    rpcUrl: process.env.MUMBAI_RPC || 'https://polygon-mumbai.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
     
     // Contract address (will be filled after deployment)
     contractAddress: process.env.CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000'
@@ -64,7 +64,7 @@ const envTemplate = `
 PRIVATE_KEY=your_private_key_here
 
 # Mumbai RPC URL
-MUMBAI_RPC=https://rpc-mumbai.maticvigil.com
+MUMBAI_RPC=https://polygon-mumbai.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161
 
 # Contract address (will be filled after deployment)
 CONTRACT_ADDRESS=0x0000000000000000000000000000000000000000
@@ -72,6 +72,9 @@ CONTRACT_ADDRESS=0x0000000000000000000000000000000000000000
 # Optional: Custom RPC endpoints
 # MUMBAI_RPC=https://polygon-mumbai.infura.io/v3/YOUR_PROJECT_ID
 # MUMBAI_RPC=https://rpc-mumbai.maticvigil.com/v1/YOUR_API_KEY
+# Alternative working endpoints:
+# MUMBAI_RPC=https://rpc.ankr.com/polygon_mumbai
+# MUMBAI_RPC=https://polygon-mumbai.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
 `;
 
 console.log('📝 Environment Variables Template:');

@@ -8,7 +8,9 @@
     "verify:mumbai": "cd contracts && npx hardhat run scripts/verify-mumbai.js --network mumbai",
     "test:contract": "cd contracts && npx hardhat test test/test-mumbai.js",
     "compile": "cd contracts && npx hardhat compile",
-    "clean": "cd contracts && npx hardhat clean"
+    "clean": "cd contracts && npx hardhat clean",
+    "cleannft:analyze": "node contracts/scripts/prepareMetadata.js --analyze",
+    "cleannft:prepare": "node contracts/scripts/prepareMetadata.js --images ./assets --nameBase 'CleanNFT Badge' --description 'Awarded for recycling {count}kg of waste' --dryRun"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,11 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.4.0",
-    "dotenv": "^17.2.0"
+    "@pinata/sdk": "^2.1.0",
+    "dotenv": "^17.2.0",
+    "fast-glob": "^3.3.2",
+    "p-limit": "^4.0.0",
+    "pinata-web3": "^0.5.4",
+    "yargs": "^17.7.2"
   }
 }
