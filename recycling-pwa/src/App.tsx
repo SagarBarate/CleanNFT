@@ -10,6 +10,7 @@ import DashboardScreen from './screens/DashboardScreen';
 import QRScannerScreen from './screens/QRScannerScreen';
 import BadgeScreen from './screens/BadgeScreen';
 import NFTClaimScreen from './screens/NFTClaimScreen';
+import { CleanNFTPage } from './features/nft/pages/CleanNFTPage';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -54,6 +55,7 @@ function App() {
             <Route path="scanner" element={<QRScannerScreen />} />
             <Route path="badges" element={<BadgeScreen />} />
             <Route path="nfts" element={<NFTClaimScreen />} />
+            <Route path="nft" element={<CleanNFTPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

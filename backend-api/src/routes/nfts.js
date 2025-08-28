@@ -186,12 +186,37 @@ router.get('/claim-status/:userAddress', async (req, res) => {
   }
 });
 
+router.post('/claim', async (req, res) => {
+  try {
+    await nftController.claimNFT(req, res);
+  } catch (error) {
+    console.error('Error in claim NFT route:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Admin routes (management)
 router.put('/update-uri', async (req, res) => {
   try {
     await nftController.updateTokenURI(req, res);
   } catch (error) {
     console.error('Error in update token URI route:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Test blockchain service route
+router.get('/test-blockchain', async (req, res) => {
+  try {
+    await nftController.testBlockchainService(req, res);
+  } catch (error) {
+    console.error('Error in blockchain test route:', error);
     res.status(500).json({
       success: false,
       error: error.message

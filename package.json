@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:amoy": "cd contracts && npx hardhat run scripts/deploy-amoy.js --network amoy",
     "deploy:mumbai": "cd contracts && npx hardhat run scripts/deploy-mumbai.js --network mumbai",
+    "verify:amoy": "cd contracts && npx hardhat run scripts/verify-amoy.js --network amoy",
     "verify:mumbai": "cd contracts && npx hardhat run scripts/verify-mumbai.js --network mumbai",
     "test:contract": "cd contracts && npx hardhat test test/test-mumbai.js",
     "compile": "cd contracts && npx hardhat compile",

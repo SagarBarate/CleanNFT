@@ -16,6 +16,7 @@ import {
   Recycling as RecycleIcon,
   People as PeopleIcon,
   Token as TokenIcon,
+  AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -25,6 +26,7 @@ const menuItems = [
   { text: 'Bin Management', icon: <RecycleIcon />, path: '/bins' },
   { text: 'User Management', icon: <PeopleIcon />, path: '/users' },
   { text: 'NFT Management', icon: <TokenIcon />, path: '/nfts' },
+  { text: 'CleanNFT Admin (Beta)', icon: <AdminIcon />, path: '/admin/nft' },
 ];
 
 const Sidebar: React.FC = () => {

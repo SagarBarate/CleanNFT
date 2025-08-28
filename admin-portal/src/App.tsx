@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import BinManagement from './components/BinManagement';
 import UserManagement from './components/UserManagement';
 import NFTManagement from './components/NFTManagement';
+import CleanNFTAdminPage from './features/cleannft-admin/pages/CleanNFTAdminPage';
 import Sidebar from './components/Sidebar';
 
 const theme = createTheme({
@@ -40,6 +41,7 @@ function App() {
               <Route path="/bins" element={<BinManagement />} />
               <Route path="/users" element={<UserManagement />} />
               <Route path="/nfts" element={<NFTManagement />} />
+              <Route path="/admin/nft" element={<CleanNFTAdminPage />} />
             </Routes>
           </Box>
         </Box>

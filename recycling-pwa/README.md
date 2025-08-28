@@ -9,6 +9,7 @@ A Progressive Web App (PWA) for incentivizing recycling through gamification, ba
 - **User Dashboard**: Track recycling progress and statistics
 - **Badge System**: Earn environmental achievement badges
 - **NFT Rewards**: Claim blockchain-based tokens for milestones
+- **CleanNFT (Beta)**: Claim and manage recycling achievement NFTs on Polygon Mumbai
 - **Points System**: Gamified recycling with point accumulation
 
 ### PWA Features
@@ -196,6 +197,50 @@ VITE_CONTRACT_ADDRESS=0x...
 - Achievement-based badge unlocking
 - Progress visualization
 - Rarity classification system
+
+### CleanNFT (Beta)
+- **Wallet Connection**: Connect MetaMask to Polygon Mumbai testnet
+- **Claimable NFTs**: View and claim available recycling achievement NFTs
+- **Owned NFTs**: Display your claimed NFTs with metadata and images
+- **IPFS Integration**: View NFT images and metadata via IPFS gateway
+- **Transaction Tracking**: Link to Polygonscan for claim transactions
+
+#### CleanNFT Environment Variables
+Add these to your `.env` file for CleanNFT functionality:
+
+```env
+# API Configuration
+VITE_API_BASE_URL=http://localhost:3001
+
+# Blockchain Configuration  
+VITE_CONTRACT_ADDRESS=0x9732e6BB31742f9FA4fd650cE20aD595983B3651
+VITE_MUMBAI_RPC_URL=https://polygon-mumbai.g.alchemy.com/v2/YOUR_API_KEY
+
+# IPFS Configuration
+VITE_IPFS_GATEWAY=https://gateway.pinata.cloud/ipfs/
+```
+
+#### CleanNFT Usage
+1. Navigate to `/nft` route in the PWA
+2. Connect your MetaMask wallet (ensure you're on Mumbai testnet)
+3. View available NFTs in the "Claimable NFTs" tab
+4. Click "Claim" to transfer ownership to your wallet
+5. Switch to "My NFTs" tab to view your claimed NFTs
+6. Click on images/metadata to view via IPFS gateway
+7. Use transaction hash links to verify on Polygonscan
+
+#### Testing CleanNFT
+```bash
+# Run the test suite
+npm test
+
+# Manual testing steps:
+# 1. Start backend API (port 3001)
+# 2. Start PWA (npm run dev)
+# 3. Navigate to /nft
+# 4. Connect wallet on Mumbai testnet
+# 5. Test claiming and viewing NFTs
+```
 
 ### NFT Management
 - Blockchain integration ready

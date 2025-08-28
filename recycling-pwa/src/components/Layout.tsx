@@ -67,6 +67,7 @@ const Layout: React.FC = () => {
     { text: 'QR Scanner', icon: <ScannerIcon />, path: '/scanner' },
     { text: 'Badges', icon: <BadgeIcon />, path: '/badges' },
     { text: 'NFTs', icon: <NFTIcon />, path: '/nfts' },
+    { text: 'CleanNFT (Beta)', icon: <NFTIcon />, path: '/nft' },
   ];
 
   const drawer = (

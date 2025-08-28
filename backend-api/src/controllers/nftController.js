@@ -1,78 +1,26 @@
-const { ethers } = require('ethers');
 const PinataService = require('../services/pinataService');
-
-// Contract ABI for the RecyclingNFT contract
-const RECYCLING_NFT_ABI = [
-  "function mintNFT(address to, string memory tokenURI) public returns (uint256)",
-  "function batchMintNFTs(address to, string[] memory tokenURIs) public returns (uint256[])",
-  "function claimNFT(uint256 tokenId) public returns (bool)",
-  "function hasUserClaimed(address user) public view returns (bool)",
-  "function getRemainingClaimableNFTs() public view returns (uint256)",
-  "function getTotalMintedNFTs() public view returns (uint256)",
-  "function maxClaimableNFTs() public view returns (uint256)",
-  "function claimedNFTs() public view returns (uint256)",
-  "function ownerOf(uint256 tokenId) public view returns (address)",
-  "function owner() public view returns (address)",
-  "function tokenURI(uint256 tokenId) public view returns (string)"
-];
+const BlockchainService = require('../services/BlockchainService');
+const fetch = require('node-fetch');
 
 class NFTController {
   constructor() {
-    this.provider = null;
-    this.adminWallet = null;
-    this.contract = null;
+    this.blockchainService = new BlockchainService();
     this.pinataService = new PinataService();
-    // Don't initialize blockchain immediately - wait for first use
   }
 
   /**
    * Check and initialize blockchain connection if needed
    */
   async ensureBlockchainInitialized() {
-    if (this.contract && this.adminWallet) {
-      return true; // Already initialized
-    }
-    
     try {
-      await this.initializeBlockchain();
-      return this.contract && this.adminWallet;
+      return await this.blockchainService.isInitialized() || await this.blockchainService.initializeBlockchain();
     } catch (error) {
       console.error('Failed to initialize blockchain:', error);
       return false;
     }
   }
 
-  /**
-   * Initialize blockchain connection
-   */
-  async initializeBlockchain() {
-    try {
-      // Check if required environment variables are set
-      const adminPrivateKey = process.env.ADMIN_PRIVATE_KEY;
-      const contractAddress = process.env.CONTRACT_ADDRESS;
-      
-      if (!adminPrivateKey || !contractAddress) {
-        console.log('Blockchain initialization skipped - missing environment variables');
-        console.log('ADMIN_PRIVATE_KEY:', adminPrivateKey ? 'Set' : 'Missing');
-        console.log('CONTRACT_ADDRESS:', contractAddress ? 'Set' : 'Missing');
-        return;
-      }
-      
-      // Initialize provider for Mumbai testnet
-      this.provider = new ethers.JsonRpcProvider(process.env.MUMBAI_RPC_URL || 'https://rpc-mumbai.maticvigil.com');
-      
-      this.adminWallet = new ethers.Wallet(adminPrivateKey, this.provider);
-      
-      this.contract = new ethers.Contract(contractAddress, RECYCLING_NFT_ABI, this.adminWallet);
-      
-      console.log('Blockchain initialized successfully');
-      console.log('Admin wallet address:', this.adminWallet.address);
-      console.log('Contract address:', contractAddress);
-    } catch (error) {
-      console.error('Failed to initialize blockchain:', error);
-      console.log('Blockchain features will be disabled');
-    }
-  }
+
 
   /**
    * Mint a single NFT to admin wallet
@@ -106,8 +54,11 @@ class NFTController {
       );
 
       // Mint NFT to admin wallet
-      const tx = await this.contract.mintNFT(
-        this.adminWallet.address,
+      const contract = await this.blockchainService.getContract();
+      const adminWallet = await this.blockchainService.getAdminWallet();
+      
+      const tx = await contract.mintNFT(
+        adminWallet.address,
         metadataResult.ipfsUrl
       );
 
@@ -117,7 +68,7 @@ class NFTController {
       // Get the token ID from the event
       const event = receipt.logs.find(log => {
         try {
-          return this.contract.interface.parseLog(log);
+          return contract.interface.parseLog(log);
         } catch {
           return false;
         }
@@ -125,7 +76,7 @@ class NFTController {
 
       let tokenId;
       if (event) {
-        const parsedLog = this.contract.interface.parseLog(event);
+        const parsedLog = contract.interface.parseLog(event);
         tokenId = parsedLog.args.tokenId.toString();
       }
 
@@ -187,11 +138,15 @@ class NFTController {
           });
         }
       }
+      
 
       // Batch mint all successful NFTs
       if (tokenURIs.length > 0) {
-        const tx = await this.contract.batchMintNFTs(
-          this.adminWallet.address,
+        const contract = await this.blockchainService.getContract();
+        const adminWallet = await this.blockchainService.getAdminWallet();
+        
+        const tx = await contract.batchMintNFTs(
+          adminWallet.address,
           tokenURIs
         );
 
@@ -224,17 +179,18 @@ class NFTController {
    */
   async getAvailableNFTs(req, res) {
     try {
-      const totalMinted = await this.contract.getTotalMintedNFTs();
+      const contract = await this.blockchainService.getContract();
+      const totalMinted = await contract.getTotalMintedNFTs();
       const availableNFTs = [];
 
       // Check each token to see if it's owned by admin (available for claiming)
       for (let i = 1; i <= totalMinted; i++) {
         try {
-          const owner = await this.contract.ownerOf(i);
-          const contractOwner = await this.contract.owner();
+          const owner = await contract.ownerOf(i);
+          const contractOwner = await contract.owner();
           
           if (owner.toLowerCase() === contractOwner.toLowerCase()) {
-            const tokenURI = await this.contract.tokenURI(i);
+            const tokenURI = await contract.tokenURI(i);
             availableNFTs.push({
               tokenId: i.toString(),
               tokenURI
@@ -275,7 +231,8 @@ class NFTController {
         });
       }
 
-      const hasClaimed = await this.contract.hasUserClaimed(userAddress);
+      const contract = await this.blockchainService.getContract();
+      const hasClaimed = await contract.hasUserClaimed(userAddress);
       
       res.json({
         success: true,
@@ -297,11 +254,12 @@ class NFTController {
    */
   async getContractStats(req, res) {
     try {
+      const contract = await this.blockchainService.getContract();
       const [totalMinted, maxClaimable, claimed, remaining] = await Promise.all([
-        this.contract.getTotalMintedNFTs(),
-        this.contract.maxClaimableNFTs(),
-        this.contract.claimedNFTs(),
-        this.contract.getRemainingClaimableNFTs()
+        contract.getTotalMintedNFTs(),
+        contract.maxClaimableNFTs(),
+        contract.claimedNFTs(),
+        contract.getRemainingClaimableNFTs()
       ]);
 
       res.json({
@@ -324,6 +282,53 @@ class NFTController {
   }
 
   /**
+   * Claim an NFT from admin wallet
+   */
+  async claimNFT(req, res) {
+    try {
+      const { tokenId, userAddress } = req.body;
+      
+      if (!tokenId || !userAddress) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Token ID and user address are required' 
+        });
+      }
+      
+      // Check and initialize blockchain if needed
+      const blockchainReady = await this.ensureBlockchainInitialized();
+      if (!blockchainReady) {
+        return res.status(503).json({
+          success: false,
+          error: 'Blockchain service not available. Please check configuration.'
+        });
+      }
+      
+      // Execute blockchain transaction
+      const contract = await this.blockchainService.getContract();
+      const tx = await contract.claimNFT(tokenId);
+      console.log(`🔄 Claiming NFT ${tokenId} for user ${userAddress}...`);
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      console.log(`✅ NFT ${tokenId} claimed successfully. TX: ${receipt.hash}`);
+      
+      res.json({ 
+        success: true, 
+        transactionHash: receipt.hash,
+        blockNumber: receipt.blockNumber
+      });
+      
+    } catch (error) {
+      console.error('❌ NFT claim failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  }
+
+  /**
    * Get NFT metadata by token ID
    */
   async getNFTMetadata(req, res) {
@@ -337,7 +342,8 @@ class NFTController {
         });
       }
 
-      const tokenURI = await this.contract.tokenURI(tokenId);
+      const contract = await this.blockchainService.getContract();
+      const tokenURI = await contract.tokenURI(tokenId);
       
       // Fetch metadata from IPFS
       const response = await fetch(tokenURI);
@@ -364,6 +370,50 @@ class NFTController {
   }
 
   /**
+   * Test blockchain service connection
+   */
+  async testBlockchainService(req, res) {
+    try {
+      console.log('🧪 Testing Blockchain Service...');
+      
+      // Test initialization
+      const blockchainReady = await this.ensureBlockchainInitialized();
+      if (!blockchainReady) {
+        return res.status(503).json({
+          success: false,
+          error: 'Blockchain service failed to initialize'
+        });
+      }
+      
+      // Test network info
+      const networkInfo = await this.blockchainService.getNetworkInfo();
+      
+      // Test admin balance
+      const adminBalance = await this.blockchainService.getAdminBalance();
+      
+      // Test contract connection
+      const contractTest = await this.blockchainService.testContractConnection();
+      
+      res.json({
+        success: true,
+        message: 'Blockchain service test completed',
+        blockchainReady,
+        networkInfo,
+        adminBalance: `${adminBalance} MATIC`,
+        contractTest
+      });
+      
+    } catch (error) {
+      console.error('❌ Blockchain service test failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  }
+
+  /**
    * Emergency function to update token URI (admin only)
    */
   async updateTokenURI(req, res) {
@@ -377,7 +427,8 @@ class NFTController {
         });
       }
 
-      const tx = await this.contract.updateTokenURI(tokenId, newTokenURI);
+      const contract = await this.blockchainService.getContract();
+      const tx = await contract.updateTokenURI(tokenId, newTokenURI);
       const receipt = await tx.wait();
 
       res.json({

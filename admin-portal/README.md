@@ -233,6 +233,70 @@ rm -rf node_modules && npm install
 npm outdated
 ```
 
+## 🎨 CleanNFT Admin (Beta)
+
+The CleanNFT Admin section provides comprehensive NFT management capabilities for authorized administrators.
+
+### Features
+
+- **Wallet Connection**: Connect MetaMask wallet with Mumbai testnet enforcement
+- **Admin Authentication**: Gate access by configured admin public address
+- **NFT Minting**: Import manifest.json files or manually enter token URIs
+- **Inventory Management**: View and manage admin-owned NFTs
+- **Authority Controls**: Pause/unpause contract, manage operator approvals
+
+### Environment Variables
+
+Create a `.env.local` file in the admin-portal directory with the following variables:
+
+```bash
+# Backend API Configuration
+REACT_APP_API_BASE_URL=http://localhost:3001/api
+
+# Mumbai Testnet Configuration
+REACT_APP_MUMBAI_RPC_URL=https://rpc-mumbai.maticvigil.com
+
+# IPFS Gateway Configuration
+REACT_APP_IPFS_GATEWAY=https://gateway.pinata.cloud/ipfs/
+
+# Admin Configuration
+REACT_APP_ADMIN_PUBLIC_ADDRESS=0xYourAdminEOA
+
+# Optional: Operator address for setApprovalForAll
+REACT_APP_OPERATOR_ADDRESS=0xYourOperatorEOA
+
+# Contract Configuration
+REACT_APP_CONTRACT_ADDRESS=0x9732e6BB31742f9FA4fd650cE20aD595983B3651
+REACT_APP_NETWORK_ID=80001
+```
+
+### How to Use
+
+1. **Setup**: Configure environment variables and ensure backend is running
+2. **Access**: Navigate to "CleanNFT Admin (Beta)" in the sidebar
+3. **Connect**: Connect your MetaMask wallet (must be on Mumbai testnet)
+4. **Authenticate**: Ensure your wallet address matches `REACT_APP_ADMIN_PUBLIC_ADDRESS`
+5. **Mint NFTs**: 
+   - Drag & drop manifest.json files from Step-1 CLI output
+   - Select entries to mint
+   - Click "Mint Selected" to create NFTs
+6. **Manage Inventory**: View, transfer, burn, and toggle claimable status
+7. **Contract Controls**: Pause/unpause contract and manage operator approvals
+
+### Prerequisites
+
+- Backend API running with NFT endpoints
+- MetaMask wallet with Mumbai testnet configured
+- Admin wallet with sufficient MATIC for gas fees
+- Valid contract address deployed on Mumbai
+
+### Security Notes
+
+- All admin operations require wallet connection
+- Network enforcement prevents accidental mainnet operations
+- Address verification ensures only authorized admins can access
+- No private keys stored in frontend
+
 ## 📚 Dependencies
 
 ### Core Dependencies
@@ -243,6 +307,8 @@ npm outdated
 - `recharts`: Chart library
 - `react-qr-code`: QR code generation
 - `axios`: HTTP client
+- `ethers`: Blockchain interaction
+- `react-dropzone`: File upload handling
 
 ### Development Dependencies
 - `typescript`: Type checking
