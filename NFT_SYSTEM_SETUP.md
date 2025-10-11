@@ -177,7 +177,6 @@ Copy your API Key and Secret Key to your environment files.
 4. Click "Claim NFT" on any available NFT
 5. Confirm transaction in MetaMask
 
-
 ## 📱 Available Components
 
 ### Admin Components

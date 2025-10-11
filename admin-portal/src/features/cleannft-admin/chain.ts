@@ -70,10 +70,6 @@ export const switchToMumbai = async (): Promise<boolean> => {
     // If the network is not added, add it
     if (error.code === 4902) {
       try {
-        if (typeof window.ethereum === 'undefined') {
-          throw new Error('MetaMask not installed');
-        }
-        
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
