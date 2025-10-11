@@ -1,0 +1,845 @@
+openapi: 3.0.3
+info:
+  title: CleanNFT API
+  description: |
+    CleanNFT Backend API - Waste recycling to NFT rewards system
+    
+    This API enables users to:
+    - Register and authenticate
+    - Submit waste recycling events
+    - Earn points for recycling activities
+    - Claim NFTs based on their recycling achievements
+    - Track their environmental impact
+    
+    Administrators can:
+    - Manage users and roles
+    - Configure recycling stations and devices
+    - Create NFT definitions and mint batches
+    - Monitor system analytics and health
+  version: 1.0.0
+  contact:
+    name: CleanNFT Team
+    email: support@cleannft.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Development server
+  - url: https://api.cleannft.com
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Health Check
+  /health:
+    get:
+      summary: Health check
+      description: Check if the API is running
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                    description: Server uptime in seconds
+
+  # Authentication
+  /api/v1/auth/register:
+    post:
+      summary: Register a new user
+      description: Create a new user account with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - displayName
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: SecurePassword123!
+                displayName:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  example: John Doe
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    description: JWT access token
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /api/v1/auth/login:
+    post:
+      summary: Login user
+      description: Authenticate user with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  example: SecurePassword123!
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    description: JWT access token
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/auth/me:
+    get:
+      summary: Get current user profile
+      description: Get detailed profile information for the authenticated user
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          stats:
+                            type: object
+                            properties:
+                              wasteEvents:
+                                type: number
+                                example: 25
+                              nftClaims:
+                                type: number
+                                example: 3
+                          wallets:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Wallet'
+                          pointBalance:
+                            $ref: '#/components/schemas/PointBalance'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # Waste Events
+  /api/v1/waste-events:
+    post:
+      summary: Create waste event
+      description: Record a new waste recycling event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWasteEvent'
+      responses:
+        '201':
+          description: Waste event created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Waste event created successfully
+                  wasteEvent:
+                    $ref: '#/components/schemas/WasteEvent'
+                  pointsAwarded:
+                    type: number
+                    description: Points awarded for this event
+                    example: 25
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    get:
+      summary: Get waste events
+      description: Retrieve waste events with pagination and filtering
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: materialType
+          in: query
+          schema:
+            type: string
+            example: plastic
+        - name: source
+          in: query
+          schema:
+            type: string
+            enum: [IOT, QR, MANUAL]
+      responses:
+        '200':
+          description: Waste events retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wasteEvents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WasteEvent'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  # Points
+  /api/v1/points/balance:
+    get:
+      summary: Get point balance
+      description: Get current point balance for the authenticated user
+      responses:
+        '200':
+          description: Point balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    $ref: '#/components/schemas/PointBalance'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/points/ledger:
+    get:
+      summary: Get point ledger
+      description: Get point transaction history for the authenticated user
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Point ledger retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ledger:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PointLedgerEntry'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  # NFT Claims
+  /api/v1/nft/claim:
+    post:
+      summary: Claim NFT
+      description: Claim an NFT based on recycling achievements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - definitionCode
+                - claimType
+              properties:
+                definitionCode:
+                  type: string
+                  example: RECYCLER_BADGE
+                claimType:
+                  type: string
+                  enum: [DRIP, ACHIEVEMENT, MANUAL]
+                  example: ACHIEVEMENT
+                criteria:
+                  type: object
+                  description: Additional criteria for the claim
+      responses:
+        '201':
+          description: NFT claim initiated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: NFT claim initiated successfully
+                  claim:
+                    $ref: '#/components/schemas/NftClaim'
+                  nftMint:
+                    $ref: '#/components/schemas/NftMint'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /api/v1/nft/my:
+    get:
+      summary: Get user NFT claims
+      description: Get all NFT claims for the authenticated user
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: NFT claims retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  claims:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NftClaim'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  # Admin - NFT Definitions
+  /api/v1/nft/definitions:
+    get:
+      summary: Get NFT definitions
+      description: Get all available NFT definitions
+      security: []
+      responses:
+        '200':
+          description: NFT definitions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  definitions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NftDefinition'
+
+    post:
+      summary: Create NFT definition (Admin)
+      description: Create a new NFT definition
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNftDefinition'
+      responses:
+        '201':
+          description: NFT definition created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: NFT definition created successfully
+                  definition:
+                    $ref: '#/components/schemas/NftDefinition'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  # Admin - Analytics
+  /api/v1/admin/analytics:
+    get:
+      summary: Get analytics (Admin)
+      description: Get system analytics and statistics
+      responses:
+        '200':
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analytics:
+                    type: object
+                    properties:
+                      users:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          active:
+                            type: number
+                          newThisMonth:
+                            type: number
+                      waste:
+                        type: object
+                        properties:
+                          totalEvents:
+                            type: number
+                          totalWeightGrams:
+                            type: number
+                          eventsThisMonth:
+                            type: number
+                      points:
+                        type: object
+                        properties:
+                          totalAwarded:
+                            type: number
+                          inCirculation:
+                            type: number
+                      nfts:
+                        type: object
+                        properties:
+                          totalDefinitions:
+                            type: number
+                          totalMints:
+                            type: number
+                          totalClaims:
+                            type: number
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        isActive:
+          type: boolean
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        roles:
+          type: array
+          items:
+            type: string
+
+    Wallet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        address:
+          type: string
+        network:
+          type: string
+        isPrimary:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    PointBalance:
+      type: object
+      properties:
+        points:
+          type: integer
+          format: int64
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateWasteEvent:
+      type: object
+      required:
+        - materialType
+        - weightGrams
+        - source
+      properties:
+        stationCode:
+          type: string
+          nullable: true
+        deviceHwId:
+          type: string
+          nullable: true
+        materialType:
+          type: string
+          example: plastic
+        weightGrams:
+          type: number
+          minimum: 0
+          example: 2500
+        source:
+          type: string
+          enum: [IOT, QR, MANUAL]
+          example: IOT
+        rawPayload:
+          type: object
+          nullable: true
+
+    WasteEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+          nullable: true
+        stationCode:
+          type: string
+          nullable: true
+        deviceId:
+          type: string
+          format: uuid
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        materialType:
+          type: string
+        weightGrams:
+          type: number
+        source:
+          type: string
+          enum: [IOT, QR, MANUAL]
+        rawPayload:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+
+    PointLedgerEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        refTable:
+          type: string
+        refId:
+          type: string
+        deltaPoints:
+          type: integer
+        reasonCode:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        pointRule:
+          type: object
+          properties:
+            code:
+              type: string
+            description:
+              type: string
+
+    NftDefinition:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        imageIpfsCid:
+          type: string
+          nullable: true
+        attributes:
+          type: object
+        supplyCap:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateNftDefinition:
+      type: object
+      required:
+        - code
+        - name
+        - description
+      properties:
+        code:
+          type: string
+          pattern: '^[A-Z_]+$'
+          example: RECYCLER_BADGE
+        name:
+          type: string
+          example: Recycler Badge
+        description:
+          type: string
+          example: Awarded for your first recycling action
+        imageIpfsCid:
+          type: string
+          nullable: true
+        attributes:
+          type: object
+          example:
+            rarity: common
+            category: achievement
+        supplyCap:
+          type: integer
+          minimum: 1
+          nullable: true
+
+    NftClaim:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        nftMintId:
+          type: string
+          format: uuid
+        claimType:
+          type: string
+          enum: [DRIP, ACHIEVEMENT, MANUAL]
+        claimedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED]
+        createdAt:
+          type: string
+          format: date-time
+
+    NftMint:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tokenId:
+          type: string
+          description: Token ID as decimal string
+        contract:
+          type: string
+        network:
+          type: string
+        status:
+          type: string
+          enum: [MINTED, TRANSFERRED, BURNED]
+        nftDefinition:
+          $ref: '#/components/schemas/NftDefinition'
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Validation failed
+              code:
+                type: string
+                example: VALIDATION_ERROR
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                    message:
+                      type: string
+                    code:
+                      type: string
+
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Authentication required
+              code:
+                type: string
+                example: UNAUTHORIZED
+
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Insufficient permissions
+              code:
+                type: string
+                example: INSUFFICIENT_PERMISSIONS
+
+    ConflictError:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Resource already exists
+              code:
+                type: string
+                example: CONFLICT
+
+    NotFoundError:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Resource not found
+              code:
+                type: string
+                example: NOT_FOUND
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Internal server error
+              code:
+                type: string
+                example: INTERNAL_ERROR

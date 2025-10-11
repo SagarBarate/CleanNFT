@@ -1,0 +1,394 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// CORE USER MANAGEMENT
+// =============================================================================
+
+model Role {
+  code String @id @db.VarChar(50)
+  name String @db.VarChar(100)
+  description String? @db.Text
+  
+  // Relations
+  userRoles UserRole[]
+  
+  @@map("roles")
+}
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique @db.Citext
+  displayName String @db.VarChar(255)
+  isActive Boolean @default(true)
+  lastLoginAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relations
+  userRoles UserRole[]
+  authAccounts AuthAccount[]
+  sessions Session[]
+  loginEvents LoginEvent[]
+  wallets Wallet[]
+  wasteEvents WasteEvent[]
+  pointLedger PointLedger[]
+  pointBalance PointBalance?
+  nftClaims NftClaim[]
+  adminActions AdminAction[]
+  assignedRoles UserRole[] @relation("RoleAssigner")
+  createdNfts NftDefinition[] @relation("NftDefinitionCreator")
+  
+  @@map("users")
+}
+
+model UserRole {
+  userId String @db.Uuid
+  roleCode String @db.VarChar(50)
+  assignedAt DateTime @default(now()) @db.Timestamptz(6)
+  assignedBy String? @db.Uuid
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleCode], references: [code], onDelete: Cascade)
+  assigner User? @relation("RoleAssigner", fields: [assignedBy], references: [id])
+  
+  @@id([userId, roleCode])
+  @@map("user_roles")
+}
+
+model AuthAccount {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  provider AuthProvider
+  providerUid String @db.VarChar(255)
+  passwordHash String? @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerUid])
+  @@map("auth_accounts")
+}
+
+model Session {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  expiresAt DateTime @db.Timestamptz(6)
+  ip String? @db.VarChar(45)
+  userAgent String? @db.Text
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("sessions")
+}
+
+model LoginEvent {
+  id String @id @default(uuid()) @db.Uuid
+  userId String? @db.Uuid
+  email String? @db.Citext
+  occurredAt DateTime @default(now()) @db.Timestamptz(6)
+  success Boolean
+  reason String? @db.VarChar(255)
+  ip String? @db.VarChar(45)
+  userAgent String? @db.Text
+  
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId, occurredAt(sort: Desc)])
+  @@map("login_events")
+}
+
+model Wallet {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  address String @db.VarChar(42)
+  network String @db.VarChar(50)
+  isPrimary Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nftMints NftMint[]
+  
+  @@unique([address, network])
+  @@map("wallets")
+}
+
+// =============================================================================
+// WASTE & RECYCLING SYSTEM
+// =============================================================================
+
+model RecyclingStation {
+  code String @id @db.VarChar(50)
+  name String @db.VarChar(255)
+  location String @db.Text
+  metadata Json? @default("{}")
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relations
+  devices Device[]
+  wasteEvents WasteEvent[]
+  
+  @@map("recycling_stations")
+}
+
+model Device {
+  id String @id @default(uuid()) @db.Uuid
+  stationCode String @db.VarChar(50)
+  hwId String @unique @db.VarChar(100)
+  status DeviceStatus @default(ACTIVE)
+  metadata Json? @default("{}")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relations
+  station RecyclingStation @relation(fields: [stationCode], references: [code])
+  wasteEvents WasteEvent[]
+  
+  @@map("devices")
+}
+
+model WasteEvent {
+  id String @id @default(uuid()) @db.Uuid
+  userId String? @db.Uuid
+  stationCode String? @db.VarChar(50)
+  deviceId String? @db.Uuid
+  occurredAt DateTime @db.Timestamptz(6)
+  materialType String @db.VarChar(100)
+  weightGrams Decimal @db.Decimal(10,2)
+  source WasteSource
+  rawPayload Json? @default("{}")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  station RecyclingStation? @relation(fields: [stationCode], references: [code])
+  device Device? @relation(fields: [deviceId], references: [id])
+  pointLedger PointLedger[] @relation("WasteEventPointLedger")
+  
+  @@index([userId, occurredAt(sort: Desc)])
+  @@map("waste_events")
+}
+
+// =============================================================================
+// POINTS SYSTEM
+// =============================================================================
+
+model PointRule {
+  code String @id @db.VarChar(50)
+  description String @db.Text
+  pointsExpr Json // e.g., {"type":"per_kg","value":10} or {"type":"flat","value":100}
+  activeFrom DateTime @db.Timestamptz(6)
+  activeTo DateTime? @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  pointLedger PointLedger[]
+  
+  @@map("point_rules")
+}
+
+model PointLedger {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  refTable String @db.VarChar(50) // 'waste_events', 'manual', etc.
+  refId String @db.Uuid
+  deltaPoints Int
+  reasonCode String @db.VarChar(50)
+  occurredAt DateTime @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointRule PointRule? @relation(fields: [reasonCode], references: [code])
+  wasteEvent WasteEvent? @relation("WasteEventPointLedger", fields: [refId], references: [id])
+  
+  @@unique([refTable, refId, reasonCode])
+  @@index([userId, occurredAt(sort: Desc)])
+  @@map("point_ledger")
+}
+
+model PointBalance {
+  userId String @id @db.Uuid
+  points BigInt @default(0)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("point_balances")
+}
+
+// =============================================================================
+// NFT SYSTEM
+// =============================================================================
+
+model NftDefinition {
+  code String @id @db.VarChar(50)
+  name String @db.VarChar(255)
+  description String @db.Text
+  imageIpfsCid String? @db.VarChar(255)
+  attributes Json? @default("{}")
+  supplyCap Int?
+  createdBy String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  createdByUser User? @relation("NftDefinitionCreator", fields: [createdBy], references: [id])
+  nftMints NftMint[]
+  
+  @@map("nft_definitions")
+}
+
+model NftMint {
+  id String @id @default(uuid()) @db.Uuid
+  nftDefCode String @db.VarChar(50)
+  tokenId Decimal @db.Decimal(78,0)
+  contract String @db.VarChar(42)
+  network String @db.VarChar(50)
+  ownerWalletId String @db.Uuid
+  mintedAt DateTime? @db.Timestamptz(6)
+  status NftMintStatus @default(MINTED)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  nftDefinition NftDefinition @relation(fields: [nftDefCode], references: [code])
+  ownerWallet Wallet @relation(fields: [ownerWalletId], references: [id])
+  nftClaims NftClaim[]
+  
+  @@unique([contract, network, tokenId])
+  @@map("nft_mints")
+}
+
+model NftClaim {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  nftMintId String @db.Uuid
+  claimType NftClaimType
+  claimedAt DateTime @db.Timestamptz(6)
+  status NftClaimStatus @default(PENDING)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nftMint NftMint @relation(fields: [nftMintId], references: [id])
+  
+  @@unique([userId, nftMintId])
+  @@index([userId, claimedAt(sort: Desc)])
+  @@map("nft_claims")
+}
+
+// =============================================================================
+// BLOCKCHAIN & TRANSACTION TRACKING
+// =============================================================================
+
+model BlockchainTx {
+  id String @id @default(uuid()) @db.Uuid
+  relatedTable String @db.VarChar(50) // 'nft_claims', 'nft_mints', etc.
+  relatedId String @db.VarChar(255)
+  network String @db.VarChar(50)
+  txHash String? @unique @db.VarChar(66)
+  status TxStatus @default(SUBMITTED)
+  submittedAt DateTime @db.Timestamptz(6)
+  confirmedAt DateTime? @db.Timestamptz(6)
+  error String? @db.Text
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  @@map("blockchain_txs")
+}
+
+model AdminAction {
+  id String @id @default(uuid()) @db.Uuid
+  adminUserId String @db.Uuid
+  action String @db.VarChar(100)
+  payload Json? @default("{}")
+  occurredAt DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  adminUser User @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  
+  @@map("admin_actions")
+}
+
+model OutboxEvent {
+  id String @id @default(uuid()) @db.Uuid
+  eventType OutboxEventType
+  aggregate String @db.VarChar(50) // 'nft_claim', 'nft_mint', etc.
+  aggregateId String @db.VarChar(255)
+  payload Json @default("{}")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  processedAt DateTime? @db.Timestamptz(6)
+  
+  @@index([eventType, processedAt])
+  @@map("outbox_events")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum AuthProvider {
+  PASSWORD
+  GOOGLE
+  WALLET
+}
+
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  ERROR
+}
+
+enum WasteSource {
+  IOT
+  QR
+  MANUAL
+}
+
+enum NftMintStatus {
+  MINTED
+  TRANSFERRED
+  BURNED
+}
+
+enum NftClaimType {
+  DRIP
+  ACHIEVEMENT
+  MANUAL
+}
+
+enum NftClaimStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum TxStatus {
+  SUBMITTED
+  CONFIRMED
+  FAILED
+}
+
+enum OutboxEventType {
+  SEND_TO_CHAIN
+  PUSH_TO_IPFS
+}
