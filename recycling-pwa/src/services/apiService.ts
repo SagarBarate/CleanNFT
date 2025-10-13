@@ -58,33 +58,80 @@ class ApiService {
 
   // User Authentication
   async signup(userData: SignupData): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+    // Transform the data to match backend API format
+    const backendData = {
+      displayName: userData.name,
+      email: userData.email,
+      password: userData.password
+    };
+
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(userData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(backendData),
     });
 
-    const result = await this.handleResponse<AuthResponse>(response);
-    if (!result.success || !result.data) {
-      throw new Error(result.error || 'Signup failed');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    return result.data;
+    const result = await response.json();
+    
+    // Transform backend response to match frontend expectations
+    return {
+      user: {
+        id: result.user.id,
+        name: result.user.displayName,
+        email: result.user.email,
+        phone: userData.phone || '',
+        role: 'user' as const,
+        totalPoints: 0,
+        bottlesRecycled: 0,
+        badgesEarned: 0,
+        nftTokens: 0,
+        createdAt: result.user.createdAt,
+        lastLogin: new Date().toISOString(),
+      },
+      token: result.token
+    };
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(credentials),
     });
 
-    const result = await this.handleResponse<AuthResponse>(response);
-    if (!result.success || !result.data) {
-      throw new Error(result.error || 'Login failed');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    return result.data;
+    const result = await response.json();
+    
+    // Transform backend response to match frontend expectations
+    return {
+      user: {
+        id: result.user.id,
+        name: result.user.displayName,
+        email: result.user.email,
+        phone: '',
+        role: 'user' as const,
+        totalPoints: 0,
+        bottlesRecycled: 0,
+        badgesEarned: 0,
+        nftTokens: 0,
+        createdAt: result.user.createdAt,
+        lastLogin: result.user.lastLoginAt || new Date().toISOString(),
+      },
+      token: result.token
+    };
   }
 
   async logout(): Promise<void> {

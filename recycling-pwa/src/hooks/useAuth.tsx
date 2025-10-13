@@ -113,34 +113,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithCredentials = async (email: string, password: string, profileImage?: File | null) => {
     try {
-      // In a real app, this would make an API call to your backend
-      // For now, we'll simulate the login process
+      // Import the API service
+      const { apiService } = await import('../services/apiService');
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Make API call to backend
+      const response = await apiService.login({ email, password });
       
-      // Mock user data - in real app, this would come from backend validation
-      const mockUser: User = {
-        id: `user-${Date.now()}`,
-        name: email.split('@')[0], // Use email prefix as name for demo
-        email,
-        phone: '',
-        profileImage: profileImage ? URL.createObjectURL(profileImage) : undefined,
-        totalPoints: 0,
-        bottlesRecycled: 0,
-        badgesEarned: 0,
-        nftTokens: 0,
-        role: 'user',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-      };
-
       // Store authentication data
-      const token = `auth-token-${Date.now()}`;
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userData', JSON.stringify(mockUser));
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('userData', JSON.stringify(response.user));
 
-      setUser(mockUser);
+      setUser(response.user);
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -149,34 +132,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (userData: SignupData) => {
     try {
-      // In a real app, this would make an API call to your backend
-      // For now, we'll simulate the signup process
+      // Import the API service
+      const { apiService } = await import('../services/apiService');
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Make API call to backend
+      const response = await apiService.signup(userData);
       
-      // Create new user
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone || '',
-        profileImage: userData.profileImage ? URL.createObjectURL(userData.profileImage) : undefined,
-        totalPoints: 0,
-        bottlesRecycled: 0,
-        badgesEarned: 0,
-        nftTokens: 0,
-        role: 'user',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-      };
-
       // Store authentication data
-      const token = `auth-token-${Date.now()}`;
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userData', JSON.stringify(newUser));
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('userData', JSON.stringify(response.user));
 
-      setUser(newUser);
+      setUser(response.user);
     } catch (error) {
       console.error('Signup failed:', error);
       throw error;
