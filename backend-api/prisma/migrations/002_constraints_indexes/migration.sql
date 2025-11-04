@@ -40,3 +40,4 @@ ON blockchain_txs (status, network);
 CREATE INDEX IF NOT EXISTS idx_nft_mints_available 
 ON nft_mints (nft_def_code, status, owner_wallet_id) 
 WHERE status = 'MINTED';
+

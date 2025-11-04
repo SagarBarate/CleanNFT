@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+:root {
+  /* CleanNFT Green Theme */
+  --green-primary: #00A86B;
+  --green-accent: #A3FFB0;
+  --green-dark: #0B0F0E;
+  --green-emerald: #10B981;
+  --green-mint: #A3FFB0;
+  
+  /* Text Colors */
+  --text-light: #F5F5F5;
+  --text-dark: #1A1A1A;
+  --text-gray: #6B7280;
+  
+  /* Background Colors */
+  --bg-dark: #0B0F0E;
+  --bg-light: #FFFFFF;
+  --bg-off-white: #FAFAFA;
+  
+  /* Gradients */
+  --gradient-emerald-mint: linear-gradient(135deg, var(--green-primary) 0%, var(--green-accent) 100%);
+}
+
+@theme {
+  --color-green-primary: var(--green-primary);
+  --color-green-accent: var(--green-accent);
+  --color-green-dark: var(--green-dark);
+  --color-green-emerald: var(--green-emerald);
+  --color-green-mint: var(--green-mint);
+  
+  --color-text-light: var(--text-light);
+  --color-text-dark: var(--text-dark);
+  --color-text-gray: var(--text-gray);
+  
+  --color-bg-dark: var(--bg-dark);
+  --color-bg-light: var(--bg-light);
+  --color-bg-off-white: var(--bg-off-white);
+}
+
+/* Green Glow Effects */
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 168, 107, 0.3);
+}
+
+.glow-green-hover:hover {
+  box-shadow: 0 0 30px rgba(0, 168, 107, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Button Styles */
+.btn-green {
+  background: var(--gradient-emerald-mint);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 168, 107, 0.4);
+}
+
+.btn-green-outline {
+  border: 2px solid var(--green-primary);
+  color: var(--green-primary);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-green-outline:hover {
+  background: var(--green-primary);
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 168, 107, 0.3);
+}
+
+/* Focus States */
+.focus-green:focus {
+  outline: 2px solid var(--green-primary);
+  outline-offset: 2px;
+}
+
+/* Rounded Corners */
+.rounded-green {
+  border-radius: 1rem;
+}
+
+/* Shadows */
+.shadow-green {
+  box-shadow: 0 4px 20px rgba(0, 168, 107, 0.2);
+}
+
+.shadow-green-lg {
+  box-shadow: 0 10px 40px rgba(0, 168, 107, 0.3);
+}
+

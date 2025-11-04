@@ -6,3 +6,5 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Enable case-insensitive text type
 CREATE EXTENSION IF NOT EXISTS "citext";
+
+

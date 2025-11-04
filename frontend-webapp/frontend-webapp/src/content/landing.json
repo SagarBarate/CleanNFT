@@ -1,0 +1,116 @@
+{
+  "hero": {
+    "title": "Turning waste into digital impact.",
+    "subtitle": "CleanNFT bridges sustainability and blockchain — rewarding every act of recycling.",
+    "description": "Recycle. Reward. Reimagine Ownership. Turn waste into digital value — powered by CleanNFT. Join thousands of eco-conscious users who are transforming their recycling habits into valuable blockchain assets on Polygon.",
+    "cta": {
+      "primary": "Explore Minted NFTs",
+      "secondary": "Learn More"
+    }
+  },
+  "features": [
+    {
+      "icon": "♻️",
+      "title": "Recycle → Mint NFT → Redeem Rewards",
+      "description": "Every recycling action creates a unique NFT on the blockchain, turning environmental impact into digital assets you can own, trade, and display."
+    },
+    {
+      "icon": "🔗",
+      "title": "Blockchain Transparency",
+      "description": "All NFT transactions are verified on-chain using Polygon, ensuring complete transparency and immutability of your recycling achievements."
+    },
+    {
+      "icon": "🌍",
+      "title": "Real-World Environmental Impact",
+      "description": "Track your contribution to a sustainable future. Every NFT represents a real recycling action with measurable environmental benefits."
+    },
+    {
+      "icon": "🏆",
+      "title": "Achievement Badges & Gamification",
+      "description": "Unlock special badges and achievements as you reach recycling milestones. Compete with friends and climb the leaderboard."
+    },
+    {
+      "icon": "📱",
+      "title": "Seamless QR Code Integration",
+      "description": "Simply scan a QR code at any smart recycling bin to instantly record your recycling activity and earn rewards automatically."
+    },
+    {
+      "icon": "💎",
+      "title": "Own Your Digital Assets",
+      "description": "Your recycling NFTs are stored securely on the blockchain. You truly own them and can trade, sell, or display them anywhere."
+    }
+  ],
+  "reviews": {
+    "title": "Read Our Reviews",
+    "badges": [
+      {
+        "name": "Recycling Community",
+        "rating": 4.9,
+        "reviews": 1247,
+        "icon": "♻️",
+        "description": "Verified users sharing their recycling journey"
+      },
+      {
+        "name": "Blockchain Enthusiasts",
+        "rating": 4.8,
+        "reviews": 892,
+        "icon": "🔗",
+        "description": "NFT collectors and Web3 supporters"
+      },
+      {
+        "name": "Environmental Advocates",
+        "rating": 4.9,
+        "reviews": 1563,
+        "icon": "🌱",
+        "description": "Eco-conscious individuals making a difference"
+      },
+      {
+        "name": "Mobile App Users",
+        "rating": 4.7,
+        "reviews": 634,
+        "icon": "📱",
+        "description": "On-the-go recyclers using our mobile app"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Sarah Chen",
+        "role": "Environmental Activist",
+        "rating": 5,
+        "text": "CleanNFT has completely changed how I approach recycling. Earning NFTs for my recycling actions makes it so much more rewarding and engaging!",
+        "location": "San Francisco, CA"
+      },
+      {
+        "name": "Marcus Johnson",
+        "role": "Crypto Enthusiast",
+        "rating": 5,
+        "text": "The blockchain integration is seamless. I love that my recycling NFTs are stored on Polygon - fast, low-cost, and truly mine. This is the future of sustainable rewards!",
+        "location": "New York, NY"
+      },
+      {
+        "name": "Emily Rodriguez",
+        "role": "College Student",
+        "rating": 5,
+        "text": "The QR code scanning is super easy and the badges are motivating. My friends and I compete to see who can recycle more - it's like a game that actually helps the planet!",
+        "location": "Austin, TX"
+      },
+      {
+        "name": "David Park",
+        "role": "Tech Professional",
+        "rating": 5,
+        "text": "As someone who cares about both technology and the environment, CleanNFT is the perfect solution. The transparency of blockchain combined with real environmental impact is brilliant.",
+        "location": "Seattle, WA"
+      }
+    ]
+  },
+  "marketTrend": {
+    "title": "Market Trend",
+    "description": "Explore the latest minted NFTs from our recycling community. See how users are transforming waste into valuable digital assets.",
+    "stats": {
+      "totalNFTs": "12,847",
+      "totalRecycled": "45.2 tons",
+      "activeUsers": "3,421",
+      "environmentalImpact": "2,846 kg CO2 saved"
+    }
+  }
+}

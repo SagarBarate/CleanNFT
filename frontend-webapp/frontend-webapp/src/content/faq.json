@@ -1,0 +1,37 @@
+{
+  "faq": [
+    {
+      "question": "What is CleanNFT?",
+      "answer": "CleanNFT is a blockchain-powered recycling rewards platform that turns waste into digital value. Every recycling action creates a verifiable NFT on the blockchain."
+    },
+    {
+      "question": "How do I get started?",
+      "answer": "Simply start recycling at any participating recycling station. Scan the QR code, and your NFT will be minted automatically. Claim it through the PWA or mobile app."
+    },
+    {
+      "question": "Which blockchain does CleanNFT use?",
+      "answer": "CleanNFT runs on the Polygon network, providing fast transactions and low gas fees. NFTs are ERC-721 standard compliant."
+    },
+    {
+      "question": "Are my NFTs secure?",
+      "answer": "Yes. All smart contracts are audited by OpenZeppelin, and 100% of user funds are stored in cold storage. Your NFTs are yours forever."
+    },
+    {
+      "question": "Can I trade my NFTs?",
+      "answer": "Yes! NFTs minted through CleanNFT are ERC-721 standard tokens and can be traded on any compatible marketplace like OpenSea."
+    },
+    {
+      "question": "What happens to my recycling data?",
+      "answer": "Your recycling data is encrypted and stored securely. Only anonymized, aggregated data is used for analytics and reporting purposes."
+    },
+    {
+      "question": "How do I claim my NFT?",
+      "answer": "After recycling at a participating station, you'll receive a notification. Simply open the CleanNFT app, connect your wallet, and claim your NFT."
+    },
+    {
+      "question": "What if I lose access to my wallet?",
+      "answer": "Please store your wallet seed phrase securely. CleanNFT cannot recover lost wallets or access your private keys. Your wallet is your responsibility."
+    }
+  ]
+}
+
