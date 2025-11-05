@@ -5,32 +5,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, TrendingUp } from "lucide-react";
 import landingContent from "@/content/landing.json";
-import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate page loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 border-4 border-[#00A86B]/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-transparent border-t-[#00A86B] rounded-full animate-spin"></div>
-          </div>
-          <p className="text-[#171717] text-sm font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
   // Fallback content if landing.json fails to load
   const heroContent = {
     title: landingContent?.hero?.title || "Turning waste into digital impact.",
