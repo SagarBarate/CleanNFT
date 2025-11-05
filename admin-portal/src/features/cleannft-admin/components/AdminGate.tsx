@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -182,12 +182,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       };
     }
-  }, []);
+  }, [checkConnection]);
 
   // Initial connection check
   useEffect(() => {
     checkConnection();
-  }, []);
+  }, [checkConnection]);
 
   const contextValue: AdminContextType = {
     ...state,
@@ -204,7 +204,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 // Gate component
 export const AdminGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { address, isAdmin, ensureMumbai, connected, loading, error, connect } = useAdmin();
+  const { address, isAdmin, ensureMumbai, connected, loading, connect } = useAdmin();
 
   if (loading) {
     return (

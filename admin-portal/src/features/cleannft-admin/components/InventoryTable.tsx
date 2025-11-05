@@ -23,7 +23,6 @@ import {
   Alert,
   CircularProgress,
   Avatar,
-  Link,
 } from '@mui/material';
 import {
   Visibility as ViewIcon,
@@ -35,7 +34,7 @@ import {
 } from '@mui/icons-material';
 import { cleannftApi, AdminInventoryItem } from '../api';
 import { ipfsToHttp } from '../utils/ipfs';
-import { getTokenOwner, getTokenURI } from '../chain';
+// import { getTokenOwner, getTokenURI } from '../chain';
 
 interface InventoryTableProps {
   onRefresh?: () => void;

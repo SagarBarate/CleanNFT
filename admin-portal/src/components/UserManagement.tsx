@@ -19,7 +19,6 @@ import {
   Button,
 } from '@mui/material';
 import {
-  Person as PersonIcon,
   EmojiEvents as BadgeIcon,
   Token as NFTIcon,
 } from '@mui/icons-material';
@@ -228,14 +227,14 @@ const UserManagement: React.FC = () => {
 
   const totalUsers = users.length;
   const activeUsers = users.filter(user => user.status === 'active').length;
-  const totalBottles = users.reduce((sum, user) => sum + user.bottlesRecycled, 0);
-  const totalPoints = users.reduce((sum, user) => sum + user.totalPoints, 0);
+  // const totalBottles = users.reduce((sum, user) => sum + user.bottlesRecycled, 0);
+  // const totalPoints = users.reduce((sum, user) => sum + user.totalPoints, 0);
   const totalBadges = users.reduce((sum, user) => sum + user.badgesEarned, 0);
   const totalNFTs = users.reduce((sum, user) => sum + user.nftTokens, 0);
   
   // For filtered results
-  const filteredTotalUsers = filteredUsers.length;
-  const filteredActiveUsers = filteredUsers.filter(user => user.status === 'active').length;
+  // const filteredTotalUsers = filteredUsers.length;
+  // const filteredActiveUsers = filteredUsers.filter(user => user.status === 'active').length;
 
   return (
     <Box sx={{ mt: 8 }}>

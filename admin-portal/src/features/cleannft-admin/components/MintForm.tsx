@@ -15,19 +15,17 @@ import {
   Chip,
   Alert,
   CircularProgress,
-  Divider,
   IconButton,
   Tooltip,
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
   Add as AddIcon,
-  Delete as DeleteIcon,
   Visibility as ViewIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
-import { cleannftApi, MintItem } from '../api';
+import { cleannftApi } from '../api';
 import { loadManifestFromFile, ManifestEntry, manifestEntriesToMintItems, getManifestStats } from '../manifest';
 import { ipfsToHttp } from '../utils/ipfs';
 

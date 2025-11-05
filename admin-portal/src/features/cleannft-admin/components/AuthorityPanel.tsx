@@ -11,7 +11,6 @@ import {
   CircularProgress,
   Chip,
   Grid,
-  Divider,
   Card,
   CardContent,
   CardActions,
@@ -32,7 +31,7 @@ interface AuthorityPanelProps {
 }
 
 const AuthorityPanel: React.FC<AuthorityPanelProps> = ({ onStateChange }) => {
-  const [contractState, setContractState] = useState<ContractState>({});
+  const [_contractState, setContractState] = useState<ContractState>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +89,7 @@ const AuthorityPanel: React.FC<AuthorityPanelProps> = ({ onStateChange }) => {
   // Load state on mount
   useEffect(() => {
     loadContractState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update operator address from env
