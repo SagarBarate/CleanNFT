@@ -5,32 +5,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, TrendingUp } from "lucide-react";
 import landingContent from "@/content/landing.json";
-import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate page loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 border-4 border-[#00A86B]/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-transparent border-t-[#00A86B] rounded-full animate-spin"></div>
-          </div>
-          <p className="text-[#171717] text-sm font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
   // Fallback content if landing.json fails to load
   const heroContent = {
     title: landingContent?.hero?.title || "Turning waste into digital impact.",
@@ -48,7 +24,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50/30 to-white pt-24">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50/30 to-white pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
@@ -111,32 +87,27 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Right Column - Visual with 3D Rotating Cards */}
+            {/* Right Column - Visual */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="relative hidden lg:block"
             >
-              <div className="relative w-full h-[600px] perspective-1000">
-                {/* Floating Cards with 3D Rotation */}
+              <div className="relative w-full h-[600px]">
+                {/* Floating Cards */}
                 <motion.div
                   animate={{
                     y: [0, -20, 0],
-                    rotateY: [0, 15, 0],
-                    rotateX: [0, 5, 0],
                   }}
                   transition={{
-                    duration: 4,
+                    duration: 3,
                     repeat: Infinity,
                     repeatType: "loop",
                   }}
-                  className="absolute top-20 left-0 bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 shadow-2xl shadow-[#00A86B]/30 w-64 transform-gpu preserve-3d"
-                  style={{
-                    boxShadow: "0 20px 60px rgba(0, 168, 107, 0.3), 0 0 40px rgba(0, 168, 107, 0.1)",
-                  }}
+                  className="absolute top-20 left-0 bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 shadow-2xl shadow-[#00A86B]/20 w-64"
                 >
-                  <div className="text-white transform-gpu">
+                  <div className="text-white">
                     <div className="text-4xl mb-2">♻️</div>
                     <h3 className="font-bold text-xl mb-2">Recycle NFT</h3>
                     <p className="text-sm opacity-90">Token #1001</p>
@@ -146,21 +117,16 @@ export default function Home() {
                 <motion.div
                   animate={{
                     y: [0, 20, 0],
-                    rotateY: [0, -15, 0],
-                    rotateX: [0, -5, 0],
                   }}
                   transition={{
-                    duration: 4,
+                    duration: 3,
                     repeat: Infinity,
                     repeatType: "loop",
                     delay: 0.5,
                   }}
-                  className="absolute top-60 right-0 bg-white rounded-2xl p-6 border-2 border-[#00A86B]/20 w-64 transform-gpu preserve-3d"
-                  style={{
-                    boxShadow: "0 25px 70px rgba(0, 0, 0, 0.15), 0 10px 30px rgba(0, 168, 107, 0.1)",
-                  }}
+                  className="absolute top-60 right-0 bg-white rounded-2xl p-6 shadow-2xl border-2 border-[#00A86B]/20 w-64"
                 >
-                  <div className="text-gray-900 transform-gpu">
+                  <div className="text-gray-900">
                     <div className="text-4xl mb-2">🌱</div>
                     <h3 className="font-bold text-xl mb-2">Eco Impact</h3>
                     <p className="text-sm text-gray-600">500g Recycled</p>
@@ -170,21 +136,16 @@ export default function Home() {
                 <motion.div
                   animate={{
                     y: [0, -15, 0],
-                    rotateY: [0, 10, 0],
-                    rotateX: [0, 8, 0],
                   }}
                   transition={{
-                    duration: 4,
+                    duration: 3,
                     repeat: Infinity,
                     repeatType: "loop",
                     delay: 1,
                   }}
-                  className="absolute bottom-20 left-10 bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 w-64 transform-gpu preserve-3d"
-                  style={{
-                    boxShadow: "0 20px 60px rgba(11, 15, 14, 0.4), 0 0 40px rgba(0, 168, 107, 0.2)",
-                  }}
+                  className="absolute bottom-20 left-10 bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 shadow-2xl w-64"
                 >
-                  <div className="text-white transform-gpu">
+                  <div className="text-white">
                     <div className="text-4xl mb-2">🏆</div>
                     <h3 className="font-bold text-xl mb-2">Reward Badge</h3>
                     <p className="text-sm opacity-90">Claim Your NFT</p>
@@ -213,10 +174,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                  style={{
-                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05)",
-                  }}
+                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-lg text-gray-900">{badge.name}</h3>
@@ -262,10 +220,7 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                    style={{
-                      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05)",
-                    }}
+                    className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
                   >
                     <div className="flex items-center space-x-2 mb-4">
                       <div className="flex">
@@ -324,10 +279,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 text-white transform-gpu hover:scale-105 transition-transform duration-300"
-                style={{
-                  boxShadow: "0 15px 40px rgba(0, 168, 107, 0.3), 0 5px 15px rgba(163, 255, 176, 0.2)",
-                }}
+                className="bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 text-white"
               >
                 <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.totalNFTs}</div>
                 <div className="text-sm opacity-90">Total NFTs Minted</div>
@@ -337,10 +289,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 text-white transform-gpu hover:scale-105 transition-transform duration-300"
-                style={{
-                  boxShadow: "0 15px 40px rgba(11, 15, 14, 0.4), 0 5px 15px rgba(0, 168, 107, 0.3)",
-                }}
+                className="bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 text-white"
               >
                 <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.totalRecycled}</div>
                 <div className="text-sm opacity-90">Waste Recycled</div>
@@ -350,10 +299,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 text-white transform-gpu hover:scale-105 transition-transform duration-300"
-                style={{
-                  boxShadow: "0 15px 40px rgba(0, 168, 107, 0.3), 0 5px 15px rgba(163, 255, 176, 0.2)",
-                }}
+                className="bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 text-white"
               >
                 <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.activeUsers}</div>
                 <div className="text-sm opacity-90">Active Users</div>
@@ -363,10 +309,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 text-white transform-gpu hover:scale-105 transition-transform duration-300"
-                style={{
-                  boxShadow: "0 15px 40px rgba(11, 15, 14, 0.4), 0 5px 15px rgba(0, 168, 107, 0.3)",
-                }}
+                className="bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 text-white"
               >
                 <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.environmentalImpact}</div>
                 <div className="text-sm opacity-90">CO₂ Saved</div>
