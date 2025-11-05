@@ -1,12 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react";
 import landingContent from "@/content/landing.json";
 
 export default function Home() {
+  const [points, setPoints] = useState(0);
+  const [bottles, setBottles] = useState([1, 2, 3, 4, 5]); // 5 bottles in the bag
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [recycledCount, setRecycledCount] = useState(0);
+
+  const recycleBottle = () => {
+    if (bottles.length > 0) {
+      // Remove a bottle
+      setBottles(prev => prev.slice(1));
+      // Add points (10 points per bottle)
+      setPoints(prev => prev + 10);
+      setRecycledCount(prev => prev + 1);
+      // Trigger celebration
+      setIsCelebrating(true);
+      setTimeout(() => setIsCelebrating(false), 2000);
+    }
+  };
+
+  const resetRecycling = () => {
+    setBottles([1, 2, 3, 4, 5]);
+    setPoints(0);
+    setRecycledCount(0);
+  };
   // Fallback content if landing.json fails to load
   const heroContent = {
     title: landingContent?.hero?.title || "Turning waste into digital impact.",
@@ -87,70 +111,146 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Right Column - Visual */}
+            {/* Right Column - Interactive Recycling Bin */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="relative hidden lg:block"
             >
-              <div className="relative w-full h-[600px]">
-                {/* Floating Cards */}
-                <motion.div
-                  animate={{
-                    y: [0, -20, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                  }}
-                  className="absolute top-20 left-0 bg-gradient-to-br from-[#00A86B] to-[#A3FFB0] rounded-2xl p-6 shadow-2xl shadow-[#00A86B]/20 w-64"
-                >
-                  <div className="text-white">
-                    <div className="text-4xl mb-2">♻️</div>
-                    <h3 className="font-bold text-xl mb-2">Recycle NFT</h3>
-                    <p className="text-sm opacity-90">Token #1001</p>
+              <div className="relative w-full h-[600px] flex flex-col items-center justify-center">
+                {/* Points Counter */}
+                <div className="absolute top-4 left-0 right-0 text-center mb-4">
+                  <div className="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-lg border-2 border-[#00A86B]/20">
+                    <span className="text-2xl">💚</span>
+                    <span className="text-2xl font-bold text-[#00A86B]">{points}</span>
+                    <span className="text-sm text-gray-600">points</span>
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  animate={{
-                    y: [0, 20, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    delay: 0.5,
-                  }}
-                  className="absolute top-60 right-0 bg-white rounded-2xl p-6 shadow-2xl border-2 border-[#00A86B]/20 w-64"
-                >
-                  <div className="text-gray-900">
-                    <div className="text-4xl mb-2">🌱</div>
-                    <h3 className="font-bold text-xl mb-2">Eco Impact</h3>
-                    <p className="text-sm text-gray-600">500g Recycled</p>
+                {/* Bottle Container (Plastic Bag) */}
+                <div className="absolute top-20 right-8">
+                  <div className="relative">
+                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-4 shadow-lg border-2 border-blue-300">
+                      <div className="text-xs text-blue-600 font-semibold mb-2 text-center">Plastic Bag</div>
+                      <div className="flex gap-2 flex-wrap w-32">
+                        {bottles.length > 0 ? (
+                          bottles.map((bottle, index) => (
+                            <motion.div
+                              key={bottle}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-8 h-12 bg-gradient-to-b from-green-400 to-green-600 rounded-t-lg rounded-b-sm shadow-md cursor-pointer hover:scale-110 transition-transform"
+                              onClick={recycleBottle}
+                              whileHover={{ scale: 1.2 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              <div className="w-full h-2 bg-green-700 rounded-t-lg"></div>
+                            </motion.div>
+                          ))
+                        ) : (
+                          <div className="text-xs text-gray-500 text-center w-full py-4">
+                            No bottles left!
+                            <button
+                              onClick={resetRecycling}
+                              className="mt-2 text-[#00A86B] font-semibold hover:underline"
+                            >
+                              Reset
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  animate={{
-                    y: [0, -15, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    delay: 1,
-                  }}
-                  className="absolute bottom-20 left-10 bg-gradient-to-br from-[#0B0F0E] to-[#00A86B] rounded-2xl p-6 shadow-2xl w-64"
-                >
-                  <div className="text-white">
-                    <div className="text-4xl mb-2">🏆</div>
-                    <h3 className="font-bold text-xl mb-2">Reward Badge</h3>
-                    <p className="text-sm opacity-90">Claim Your NFT</p>
-                  </div>
-                </motion.div>
+                {/* Recycling Bin (VIN) */}
+                <div className="relative mt-32">
+                  <motion.div
+                    animate={bottles.length === 0 ? { scale: [1, 1.05, 1] } : {}}
+                    transition={{ duration: 0.5 }}
+                    className="relative"
+                  >
+                    {/* Bin Body */}
+                    <div className="w-48 h-64 bg-gradient-to-b from-gray-300 to-gray-500 rounded-lg shadow-2xl border-4 border-gray-600 relative overflow-hidden">
+                      {/* Bin Top Opening */}
+                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-56 h-20 bg-gradient-to-b from-gray-400 to-gray-600 rounded-t-lg border-4 border-gray-600"></div>
+                      
+                      {/* Recycling Symbol */}
+                      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-6xl">♻️</div>
+                      
+                      {/* Bin Label */}
+                      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-lg">
+                        <span className="text-sm font-bold text-[#00A86B]">RECYCLE</span>
+                      </div>
+
+                      {/* Drop Zone Indicator */}
+                      {bottles.length > 0 && (
+                        <motion.div
+                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="absolute top-0 left-0 right-0 h-24 bg-green-200/30 rounded-t-lg pointer-events-none"
+                        />
+                      )}
+                    </div>
+
+                    {/* Celebration Animation */}
+                    <AnimatePresence>
+                      {isCelebrating && (
+                        <>
+                          {/* Confetti Effect */}
+                          {[...Array(20)].map((_, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ 
+                                opacity: 1,
+                                x: 0,
+                                y: 0,
+                                rotate: 0,
+                              }}
+                              animate={{
+                                opacity: [1, 1, 0],
+                                x: Math.random() * 400 - 200,
+                                y: Math.random() * 400 - 200,
+                                rotate: Math.random() * 360,
+                              }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 1, delay: i * 0.05 }}
+                              className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full"
+                              style={{
+                                backgroundColor: ['#00A86B', '#A3FFB0', '#FFD700', '#FF6B6B'][Math.floor(Math.random() * 4)],
+                              }}
+                            />
+                          ))}
+                          
+                          {/* Success Message */}
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#00A86B] to-[#A3FFB0] text-white px-6 py-3 rounded-full shadow-xl"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-2xl">🎉</span>
+                              <span className="font-bold">+10 Points!</span>
+                              <span className="text-2xl">🎉</span>
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </div>
+
+                {/* Instruction Text */}
+                <div className="absolute bottom-8 left-0 right-0 text-center">
+                  <p className="text-sm text-gray-600">
+                    {bottles.length > 0 
+                      ? `Click bottles to recycle! ${bottles.length} bottle${bottles.length > 1 ? 's' : ''} remaining`
+                      : `🎊 Great job! You recycled ${recycledCount} bottles and earned ${points} points!`
+                    }
+                  </p>
+                </div>
               </div>
             </motion.div>
           </div>
