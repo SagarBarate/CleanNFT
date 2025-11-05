@@ -51,3 +51,17 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* 3D Perspective for rotating cards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
