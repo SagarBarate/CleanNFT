@@ -66,10 +66,10 @@ export function Header() {
           : "-top-full translate-y-[-100%] opacity-0 pointer-events-none"
       )}
     >
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <nav className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-20">
         <div 
           className={cn(
-            "flex h-16 items-center justify-between bg-white rounded-lg px-6 transition-all duration-300",
+            "flex items-center justify-between bg-white rounded-lg px-5 py-2.5 min-h-[64px] transition-all duration-300",
             isScrolled && "shadow-lg border border-gray-100"
           )}
           style={{
@@ -79,21 +79,21 @@ export function Header() {
           }}
         >
           {/* Logo - MetaMask style (stacked) with green NFT */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center py-2">
             <span className={cn("text-xl font-bold tracking-tight flex flex-col leading-tight")}>
-              <span className="text-2xl text-[#171717]">Clean</span>
-              <span className="text-2xl text-[#00A86B]">NFT</span>
+              <span className="text-3xl text-[#171717]">Clean</span>
+              <span className="text-3xl text-[#00A86B]">NFT</span>
             </span>
           </Link>
 
           {/* Desktop Navigation - MetaMask style center positioning */}
-          <div className="hidden md:flex items-center space-x-6 flex-1 justify-center">
+          <div className="hidden md:flex items-center space-x-8 flex-1 justify-center">
             {navItems.map((item) => (
               <div key={item.href} className="relative group">
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex items-center space-x-1 text-sm font-medium transition-colors",
+                    "flex items-center space-x-1.5 text-base font-medium transition-colors px-3 py-2 rounded-md hover:bg-gray-50",
                     pathname === item.href
                       ? "text-[#171717]"
                       : cn(textColor, textColorHover)
@@ -101,7 +101,7 @@ export function Header() {
                 >
                   <span>{item.label}</span>
                   {item.hasDropdown && (
-                    <ChevronDown className="h-4 w-4 opacity-70" />
+                    <ChevronDown className="h-5 w-5 opacity-70" />
                   )}
                 </Link>
               </div>
@@ -110,7 +110,7 @@ export function Header() {
             <Link
               href="/nfts"
               className={cn(
-                "text-sm font-medium transition-colors",
+                "text-base font-medium transition-colors px-3 py-2 rounded-md hover:bg-gray-50",
                 pathname === "/nfts"
                   ? "text-[#171717]"
                   : cn(textColor, textColorHover)
@@ -124,7 +124,7 @@ export function Header() {
               href={portalLinks.users}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn("text-sm font-medium transition-colors", textColor, textColorHover)}
+              className={cn("text-base font-medium transition-colors px-3 py-2 rounded-md hover:bg-gray-50", textColor, textColorHover)}
             >
               Users Portal
             </a>
@@ -132,7 +132,7 @@ export function Header() {
               href={portalLinks.admin}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn("text-sm font-medium transition-colors", textColor, textColorHover)}
+              className={cn("text-base font-medium transition-colors px-3 py-2 rounded-md hover:bg-gray-50", textColor, textColorHover)}
             >
               Admin Portal
             </a>
@@ -142,8 +142,8 @@ export function Header() {
           <div className="hidden md:flex items-center">
             <Link href="/nfts">
               <Button 
-                size="sm" 
-                className="bg-[#171717] text-white hover:bg-[#171717]/90 rounded-md px-4 py-2 text-sm font-medium"
+                size="default" 
+                className="bg-[#171717] text-white hover:bg-[#171717]/90 rounded-md px-6 py-3 text-base font-medium h-auto"
               >
                 Explore NFTs
               </Button>
@@ -153,27 +153,27 @@ export function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={cn("md:hidden p-2", textColor)}
+            className={cn("md:hidden p-3 rounded-md hover:bg-gray-50", textColor)}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
+              <X className="h-7 w-7" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Menu className="h-7 w-7" />
             )}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className={cn("md:hidden py-4 space-y-4 border-t", borderColor)}>
+          <div className={cn("md:hidden py-4 space-y-3 border-t", borderColor)}>
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
-                  "block text-sm font-medium transition-colors",
+                  "block text-base font-medium transition-colors px-3 py-3 rounded-md hover:bg-gray-50",
                   pathname === item.href
                     ? "text-[#00A86B]"
                     : cn(textColor, textColorHover)
@@ -186,7 +186,7 @@ export function Header() {
               href="/nfts"
               onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
-                "block text-sm font-medium transition-colors",
+                "block text-base font-medium transition-colors px-3 py-3 rounded-md hover:bg-gray-50",
                 pathname === "/nfts"
                   ? "text-[#00A86B]"
                   : cn(textColor, textColorHover)
@@ -199,7 +199,7 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={cn("block text-sm font-medium transition-colors", textColor, textColorHover)}
+              className={cn("block text-base font-medium transition-colors px-3 py-3 rounded-md hover:bg-gray-50", textColor, textColorHover)}
             >
               Users Portal
             </a>
@@ -208,15 +208,15 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={cn("block text-sm font-medium transition-colors", textColor, textColorHover)}
+              className={cn("block text-base font-medium transition-colors px-3 py-3 rounded-md hover:bg-gray-50", textColor, textColorHover)}
             >
               Admin Portal
             </a>
             <div className="pt-4 space-y-2">
               <Link href="/nfts" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button
-                  size="sm"
-                  className="w-full bg-[#171717] text-white hover:bg-[#171717]/90"
+                  size="default"
+                  className="w-full bg-[#171717] text-white hover:bg-[#171717]/90 py-3 text-base font-medium"
                 >
                   Explore NFTs
                 </Button>

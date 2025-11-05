@@ -36,12 +36,22 @@ export function NftCard({ nft, onClick }: NftCardProps) {
       {/* NFT Image */}
       <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden bg-gray-100">
         {nft.metadata.image ? (
-          <Image
-            src={nft.metadata.image}
-            alt={nft.metadata.name}
-            fill
-            className="object-cover"
-          />
+          // Check if image is an emoji or a valid URL
+          nft.metadata.image.startsWith('http://') || 
+          nft.metadata.image.startsWith('https://') || 
+          nft.metadata.image.startsWith('/') ? (
+            <Image
+              src={nft.metadata.image}
+              alt={nft.metadata.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            // Render emoji as text
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#00A86B] to-[#A3FFB0]">
+              <span className="text-6xl">{nft.metadata.image}</span>
+            </div>
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#00A86B] to-[#A3FFB0]">
             <span className="text-4xl font-bold text-white">♻️</span>

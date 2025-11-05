@@ -121,24 +121,101 @@ export default function NFTsPage() {
 
         {/* Empty State */}
         {!isLoading && !error && data && data.nfts.length === 0 && (
-          <div className="bg-white rounded-2xl p-12 text-center shadow-lg">
-            <div className="text-6xl mb-4">♻️</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              No NFTs Found
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Try adjusting your filters or check back later for new NFTs.
-            </p>
-            <Button
-              onClick={() =>
-                setFilters({
-                  page: 1,
-                  limit: 20,
-                })
-              }
-            >
-              Clear Filters
-            </Button>
+          <div className="bg-white rounded-2xl p-12 shadow-lg">
+            <div className="text-center mb-8">
+              <div className="text-6xl mb-4">♻️</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                No NFTs Found with Current Filters
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your filters or check back later for new NFTs.
+              </p>
+              <Button
+                onClick={() =>
+                  setFilters({
+                    page: 1,
+                    limit: 20,
+                  })
+                }
+              >
+                Clear Filters
+              </Button>
+            </div>
+            
+            {/* Show All Available Badges and NFTs */}
+            <div className="mt-12 border-t pt-8">
+              <h4 className="text-xl font-bold text-gray-900 mb-6 text-center">
+                All Available Badges & NFTs
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                {/* Badges */}
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌱</div>
+                  <p className="text-sm font-medium">Recycling Rookie</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌿</div>
+                  <p className="text-sm font-medium">Green Guardian</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌳</div>
+                  <p className="text-sm font-medium">Eco Warrior</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🏆</div>
+                  <p className="text-sm font-medium">Sustainability Champion</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌍</div>
+                  <p className="text-sm font-medium">Planet Protector</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">📅</div>
+                  <p className="text-sm font-medium">Weekly Recycler</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">👥</div>
+                  <p className="text-sm font-medium">Community Leader</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">💡</div>
+                  <p className="text-sm font-medium">Innovation Pioneer</p>
+                </div>
+                {/* NFTs */}
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌱</div>
+                  <p className="text-sm font-medium">Recycling Pioneer</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌿</div>
+                  <p className="text-sm font-medium">Green Innovator</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌳</div>
+                  <p className="text-sm font-medium">Sustainability Leader</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌍</div>
+                  <p className="text-sm font-medium">Planet Guardian</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">📅</div>
+                  <p className="text-sm font-medium">Weekly Champion</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">👥</div>
+                  <p className="text-sm font-medium">Community Hero</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">💡</div>
+                  <p className="text-sm font-medium">Innovation Master</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🌱</div>
+                  <p className="text-sm font-medium">Carbon Neutral</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

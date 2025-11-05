@@ -26,7 +26,7 @@
     }
   ],
   "reviews": {
-    "title": "Read Our Reviews",
+    "title": "What My Friends and Professors Say About This Startup",
     "badges": [
       {
         "name": "Real Reviews",
@@ -39,6 +39,50 @@
         "rating": 4.6,
         "reviews": 96,
         "icon": "⭐"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Dr. Mary",
+        "role": "Professor",
+        "rating": 5,
+        "text": "This startup is truly revolutionary! The integration of IoT technology with recycling creates a rationalized approach that bridges the gap between environmental consciousness and tangible rewards. The NFT-based reward system not only encourages people to recycle but also makes the process engaging and rewarding. It's a brilliant way to incentivize sustainable behavior.",
+        "location": "Academic Advisor"
+      },
+      {
+        "name": "Prof. Tiago",
+        "role": "Professor",
+        "rating": 5,
+        "text": "I'm genuinely inspired by this innovative concept. The reward system effectively reduces the gap between intention and action when it comes to recycling. By combining IoT sensors with blockchain technology, CleanNFT creates a transparent, verifiable system that encourages people to recycle waste and earn NFTs as rewards. This is the future of environmental sustainability.",
+        "location": "Technology Mentor"
+      },
+      {
+        "name": "Parimal",
+        "role": "Friend & Supporter",
+        "rating": 5,
+        "text": "This idea is absolutely brilliant! The way CleanNFT uses IoT integration to track recycling and reward users with NFTs is groundbreaking. It makes recycling not just a responsibility, but an exciting opportunity to earn digital rewards. The gap between environmental awareness and actual action is finally being bridged through this innovative reward system.",
+        "location": "Entrepreneurship Enthusiast"
+      },
+      {
+        "name": "Hrishikesh",
+        "role": "Friend & Supporter",
+        "rating": 5,
+        "text": "I'm so inspired by this startup! The IoT integration rationalizes the entire recycling process by making it measurable and rewarding. People can now see real value in recycling - not just environmental benefits, but actual NFT rewards. This reward system encourages more people to recycle waste and get rewarded for their efforts. It's a game-changer!",
+        "location": "Technology Advocate"
+      },
+      {
+        "name": "Mario",
+        "role": "Friend & Supporter",
+        "rating": 5,
+        "text": "CleanNFT is solving a real problem by closing the gap between wanting to recycle and actually doing it. The IoT integration makes the process transparent and trustworthy, while the NFT rewards create genuine motivation. This startup encourages people to recycle waste and get NFTs on reward - it's brilliant how technology can drive positive environmental change!",
+        "location": "Sustainability Enthusiast"
+      },
+      {
+        "name": "Bindisha",
+        "role": "Friend & Supporter",
+        "rating": 5,
+        "text": "This startup truly inspires me! The combination of IoT technology with blockchain creates a rationalized approach to recycling that makes sense. The reward system bridges the gap perfectly - people are encouraged to recycle waste and get NFTs as rewards. It's not just about environmental impact anymore; it's about making sustainability rewarding and accessible to everyone.",
+        "location": "Environmental Activist"
       }
     ]
   },

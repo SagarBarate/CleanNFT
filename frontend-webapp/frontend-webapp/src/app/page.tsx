@@ -15,33 +15,50 @@ export default function Home() {
   const [draggedBottle, setDraggedBottle] = useState<number | null>(null);
   const [recycledBottles, setRecycledBottles] = useState<number[]>([]); // Bottles that have been recycled and are in the bin
 
-  const handleDragStart = (bottleId: number) => {
+  const handleDragStart = (e: React.DragEvent, bottleId: number) => {
     setDraggedBottle(bottleId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", bottleId.toString());
+    // Make the dragged element semi-transparent
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "0.5";
+    }
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e: React.DragEvent) => {
     setDraggedBottle(null);
+    // Reset opacity
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "1";
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    if (draggedBottle !== null && bottles.includes(draggedBottle)) {
+    e.stopPropagation();
+    
+    const bottleIdStr = e.dataTransfer.getData("text/plain");
+    const bottleId = parseInt(bottleIdStr, 10);
+    
+    if (!isNaN(bottleId) && bottles.includes(bottleId)) {
       // Remove bottle from bag
-      setBottles(prev => prev.filter(id => id !== draggedBottle));
+      setBottles(prev => prev.filter(id => id !== bottleId));
       // Add to recycled bottles (will stick to bin)
-      setRecycledBottles(prev => [...prev, draggedBottle]);
+      setRecycledBottles(prev => [...prev, bottleId]);
       // Add points (10 points per bottle)
       setPoints(prev => prev + 10);
       setRecycledCount(prev => prev + 1);
       // Trigger celebration
       setIsCelebrating(true);
-      setTimeout(() => setIsCelebrating(false), 2000);
+      setTimeout(() => setIsCelebrating(false), 3000);
       setDraggedBottle(null);
     }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
   };
 
   const resetRecycling = () => {
@@ -67,7 +84,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50/30 to-white pt-24">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50/30 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
@@ -163,24 +180,30 @@ export default function Home() {
                       <div className="flex gap-2 flex-wrap w-32 min-h-[80px]">
                         {bottles.length > 0 ? (
                           bottles.map((bottle, index) => (
-                            <motion.div
+                            <div
                               key={bottle}
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              drag
-                              dragConstraints={false}
-                              onDragStart={() => handleDragStart(bottle)}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, bottle)}
                               onDragEnd={handleDragEnd}
-                              whileDrag={{ scale: 1.4, zIndex: 50, rotate: 15, cursor: 'grabbing' }}
-                              className="w-8 h-12 bg-gradient-to-b from-green-400 to-green-600 rounded-t-lg rounded-b-sm shadow-lg cursor-grab active:cursor-grabbing hover:scale-110 transition-transform relative"
-                              style={{ cursor: 'grab' }}
+                              className="w-8 h-12 rounded-t-lg rounded-b-sm shadow-lg cursor-grab active:cursor-grabbing hover:scale-110 transition-transform relative bg-gradient-to-b from-white/95 via-white/90 to-white/95 border-2 border-gray-200/50"
+                              style={{ 
+                                cursor: 'grab',
+                                WebkitUserSelect: 'none',
+                                userSelect: 'none',
+                              }}
                             >
-                              <div className="w-full h-2 bg-green-700 rounded-t-lg"></div>
-                              {/* Bottle cap */}
-                              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-1.5 bg-green-800 rounded-full"></div>
-                              {/* Bottle label/reflection */}
-                              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-white/20 rounded"></div>
-                            </motion.div>
+                              {/* Bottle cap - blue like actual bottle caps */}
+                              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-1.5 bg-blue-600 rounded-full shadow-sm"></div>
+                              {/* Bottle top rim */}
+                              <div className="w-full h-1.5 bg-gradient-to-b from-gray-200 to-white rounded-t-lg border-b border-gray-300/50"></div>
+                              {/* Bottle body - white/transparent with slight blue tint */}
+                              <div className="absolute top-1.5 left-0 right-0 bottom-0 bg-gradient-to-b from-white/90 via-white/80 to-white/70 rounded-b-sm"></div>
+                              {/* Bottle label area - subtle reflection */}
+                              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-5 h-8 bg-gradient-to-b from-blue-100/30 to-transparent rounded border border-blue-200/20"></div>
+                              {/* Horizontal ridges like real bottles */}
+                              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-gray-300/40"></div>
+                              <div className="absolute top-9 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-gray-300/40"></div>
+                            </div>
                           ))
                         ) : (
                           <div className="text-xs text-gray-500 text-center w-full py-4">
@@ -263,61 +286,179 @@ export default function Home() {
                             stiffness: 200,
                             damping: 15,
                           }}
-                          className="absolute w-6 h-10 bg-gradient-to-b from-green-400 to-green-600 rounded-t-lg rounded-b-sm shadow-lg"
+                          className="absolute w-6 h-10 rounded-t-lg rounded-b-sm shadow-lg bg-gradient-to-b from-white/95 via-white/90 to-white/95 border border-gray-200/50"
                           style={{
                             left: '50%',
                             transformOrigin: 'center',
                           }}
                         >
-                          <div className="w-full h-1.5 bg-green-700 rounded-t-lg"></div>
                           {/* Bottle cap */}
-                          <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-2.5 h-1 bg-green-800 rounded-full"></div>
+                          <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-2.5 h-1 bg-blue-600 rounded-full shadow-sm"></div>
+                          {/* Bottle top rim */}
+                          <div className="w-full h-1.5 bg-gradient-to-b from-gray-200 to-white rounded-t-lg border-b border-gray-300/50"></div>
+                          {/* Bottle body */}
+                          <div className="absolute top-1.5 left-0 right-0 bottom-0 bg-gradient-to-b from-white/90 via-white/80 to-white/70 rounded-b-sm"></div>
+                          {/* Label reflection */}
+                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-gradient-to-b from-blue-100/30 to-transparent rounded"></div>
                         </motion.div>
                       ))}
                     </div>
 
-                    {/* Celebration Animation */}
+                    {/* Celebration Animation - Sparkling Effect */}
                     <AnimatePresence>
                       {isCelebrating && (
                         <>
-                          {/* Confetti Effect */}
-                          {[...Array(20)].map((_, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ 
-                                opacity: 1,
-                                x: 0,
-                                y: 0,
-                                rotate: 0,
-                              }}
-                              animate={{
-                                opacity: [1, 1, 0],
-                                x: Math.random() * 400 - 200,
-                                y: Math.random() * 400 - 200,
-                                rotate: Math.random() * 360,
-                              }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 1, delay: i * 0.05 }}
-                              className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full"
-                              style={{
-                                backgroundColor: ['#00A86B', '#A3FFB0', '#FFD700', '#FF6B6B'][Math.floor(Math.random() * 4)],
-                              }}
-                            />
-                          ))}
+                          {/* Sparkling Confetti Particles */}
+                          {[...Array(50)].map((_, i) => {
+                            const angle = (i / 50) * Math.PI * 2;
+                            const distance = 100 + Math.random() * 150;
+                            const x = Math.cos(angle) * distance;
+                            const y = Math.sin(angle) * distance;
+                            const colors = ['#00A86B', '#A3FFB0', '#FFD700', '#FF6B6B', '#FFA500', '#FF69B4', '#00CED1', '#9370DB'];
+                            const color = colors[Math.floor(Math.random() * colors.length)];
+                            
+                            return (
+                              <motion.div
+                                key={i}
+                                initial={{ 
+                                  opacity: 1,
+                                  x: 0,
+                                  y: 0,
+                                  scale: 1,
+                                  rotate: 0,
+                                }}
+                                animate={{
+                                  opacity: [1, 1, 0.8, 0],
+                                  x: x,
+                                  y: y,
+                                  scale: [1, 1.5, 0.5, 0],
+                                  rotate: Math.random() * 720,
+                                }}
+                                exit={{ opacity: 0 }}
+                                transition={{ 
+                                  duration: 2,
+                                  delay: i * 0.02,
+                                  ease: "easeOut"
+                                }}
+                                className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full"
+                                style={{
+                                  backgroundColor: color,
+                                  boxShadow: `0 0 10px ${color}, 0 0 20px ${color}`,
+                                  filter: 'blur(0.5px)',
+                                }}
+                              />
+                            );
+                          })}
                           
-                          {/* Success Message */}
+                          {/* Sparkle Stars */}
+                          {[...Array(30)].map((_, i) => {
+                            const angle = (i / 30) * Math.PI * 2;
+                            const distance = 80 + Math.random() * 100;
+                            const x = Math.cos(angle) * distance;
+                            const y = Math.sin(angle) * distance;
+                            
+                            return (
+                              <motion.div
+                                key={`star-${i}`}
+                                initial={{ 
+                                  opacity: 0,
+                                  scale: 0,
+                                  x: 0,
+                                  y: 0,
+                                }}
+                                animate={{
+                                  opacity: [0, 1, 1, 0],
+                                  scale: [0, 1.5, 1, 0],
+                                  x: x,
+                                  y: y,
+                                  rotate: [0, 180, 360],
+                                }}
+                                exit={{ opacity: 0 }}
+                                transition={{ 
+                                  duration: 1.5,
+                                  delay: i * 0.03,
+                                  ease: "easeOut"
+                                }}
+                                className="absolute top-1/2 left-1/2 text-2xl"
+                                style={{
+                                  filter: 'drop-shadow(0 0 4px #FFD700)',
+                                }}
+                              >
+                                ✨
+                              </motion.div>
+                            );
+                          })}
+                          
+                          {/* Success Message with Sparkles */}
                           <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
+                            initial={{ scale: 0, opacity: 0, y: 20 }}
+                            animate={{ 
+                              scale: 1,
+                              opacity: 1,
+                              y: 0,
+                            }}
                             exit={{ scale: 0, opacity: 0 }}
-                            className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#00A86B] to-[#A3FFB0] text-white px-6 py-3 rounded-full shadow-xl"
+                            transition={{ 
+                              duration: 0.5,
+                              type: "spring",
+                              stiffness: 200,
+                              damping: 15
+                            }}
+                            className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#00A86B] via-[#A3FFB0] to-[#00A86B] text-white px-8 py-4 rounded-full shadow-2xl z-50"
+                            style={{
+                              boxShadow: '0 0 30px rgba(0, 168, 107, 0.5), 0 0 60px rgba(163, 255, 176, 0.3)',
+                            }}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="text-2xl">🎉</span>
-                              <span className="font-bold">+10 Points!</span>
-                              <span className="text-2xl">🎉</span>
+                            <div className="flex items-center gap-3">
+                              <motion.span 
+                                animate={{ rotate: 360, scale: 1.2 }}
+                                transition={{ 
+                                  duration: 0.5, 
+                                  repeat: Infinity, 
+                                  repeatDelay: 0.5,
+                                  rotate: { duration: 0.5, ease: "linear" },
+                                  scale: { duration: 0.3, repeat: Infinity, repeatType: "reverse" }
+                                }}
+                                className="text-3xl"
+                              >
+                                🎉
+                              </motion.span>
+                              <span className="font-bold text-lg">+10 Points!</span>
+                              <motion.span 
+                                animate={{ rotate: -360, scale: 1.2 }}
+                                transition={{ 
+                                  duration: 0.5, 
+                                  repeat: Infinity, 
+                                  repeatDelay: 0.5,
+                                  rotate: { duration: 0.5, ease: "linear" },
+                                  scale: { duration: 0.3, repeat: Infinity, repeatType: "reverse" }
+                                }}
+                                className="text-3xl"
+                              >
+                                🎉
+                              </motion.span>
                             </div>
                           </motion.div>
+                          
+                          {/* Glow Effect Around Bin */}
+                          <motion.div
+                            initial={{ opacity: 0, scale: 1 }}
+                            animate={{ 
+                              opacity: 0.6,
+                              scale: 1.2,
+                            }}
+                            exit={{ opacity: 0, scale: 1.4 }}
+                            transition={{ 
+                              duration: 2,
+                              opacity: { duration: 2, repeat: Infinity, repeatType: "reverse" },
+                              scale: { duration: 2, repeat: Infinity, repeatType: "reverse" }
+                            }}
+                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full pointer-events-none"
+                            style={{
+                              background: 'radial-gradient(circle, rgba(0, 168, 107, 0.4) 0%, transparent 70%)',
+                              filter: 'blur(20px)',
+                            }}
+                          />
                         </>
                       )}
                     </AnimatePresence>
@@ -347,7 +488,7 @@ export default function Home() {
           </h2>
           
           {/* Review Badges */}
-          {heroContent.reviews.badges && heroContent.reviews.badges.length > 0 && (
+          {Boolean(heroContent.reviews && 'badges' in heroContent.reviews && Array.isArray(heroContent.reviews.badges) && heroContent.reviews.badges.length > 0) && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
               {heroContent.reviews.badges.map((badge, index) => (
                 <motion.div
@@ -383,22 +524,19 @@ export default function Home() {
                   <p className="text-sm text-gray-600 mb-2">
                     Based on {badge.reviews.toLocaleString()} reviews
                   </p>
-                  {badge.description && (
-                    <p className="text-xs text-gray-500 mt-2">{badge.description}</p>
-                  )}
                 </motion.div>
               ))}
             </div>
           )}
 
           {/* Testimonials */}
-          {heroContent.reviews.testimonials && heroContent.reviews.testimonials.length > 0 && (
+          {Boolean(heroContent.reviews && 'testimonials' in heroContent.reviews && Array.isArray(heroContent.reviews.testimonials) && heroContent.reviews.testimonials.length > 0) && (
             <div className="max-w-6xl mx-auto">
               <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">
-                What Our Users Say
+                Testimonials from Our Supporters
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {heroContent.reviews.testimonials.map((testimonial, index) => (
+                {((heroContent.reviews as any).testimonials as any[]).map((testimonial: any, index: number) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -460,7 +598,7 @@ export default function Home() {
           </div>
           
           {/* Stats Grid */}
-          {heroContent.marketTrend.stats && (
+          {Boolean(heroContent.marketTrend && 'stats' in heroContent.marketTrend && (heroContent.marketTrend as any).stats) && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -472,7 +610,7 @@ export default function Home() {
                   boxShadow: "0 15px 40px rgba(0, 168, 107, 0.3), 0 5px 15px rgba(163, 255, 176, 0.2)",
                 }}
               >
-                <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.totalNFTs}</div>
+                <div className="text-3xl font-bold mb-2">{(heroContent.marketTrend as any).stats.totalNFTs}</div>
                 <div className="text-sm opacity-90">Total NFTs Minted</div>
               </motion.div>
               <motion.div
@@ -485,7 +623,7 @@ export default function Home() {
                   boxShadow: "0 15px 40px rgba(11, 15, 14, 0.4), 0 5px 15px rgba(0, 168, 107, 0.3)",
                 }}
               >
-                <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.totalRecycled}</div>
+                <div className="text-3xl font-bold mb-2">{(heroContent.marketTrend as any).stats.totalRecycled}</div>
                 <div className="text-sm opacity-90">Waste Recycled</div>
               </motion.div>
               <motion.div
@@ -498,7 +636,7 @@ export default function Home() {
                   boxShadow: "0 15px 40px rgba(0, 168, 107, 0.3), 0 5px 15px rgba(163, 255, 176, 0.2)",
                 }}
               >
-                <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.activeUsers}</div>
+                <div className="text-3xl font-bold mb-2">{(heroContent.marketTrend as any).stats.activeUsers}</div>
                 <div className="text-sm opacity-90">Active Users</div>
               </motion.div>
               <motion.div
@@ -511,7 +649,7 @@ export default function Home() {
                   boxShadow: "0 15px 40px rgba(11, 15, 14, 0.4), 0 5px 15px rgba(0, 168, 107, 0.3)",
                 }}
               >
-                <div className="text-3xl font-bold mb-2">{heroContent.marketTrend.stats.environmentalImpact}</div>
+                <div className="text-3xl font-bold mb-2">{(heroContent.marketTrend as any).stats.environmentalImpact}</div>
                 <div className="text-sm opacity-90">CO₂ Saved</div>
               </motion.div>
             </div>
