@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { resolve } from "path";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -23,6 +24,12 @@ const nextConfig: NextConfig = {
       };
     }
     return config;
+  },
+  // Turbopack configuration (empty for now - using webpack)
+  // This silences the warning about webpack config with Turbopack
+  turbopack: {
+    // Set root directory to fix workspace detection issue with multiple lockfiles
+    root: process.cwd(),
   },
 };
 
