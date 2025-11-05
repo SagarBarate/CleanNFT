@@ -48,7 +48,7 @@ export function Header() {
   // Portal links - these should point to the actual admin and customer portals
   const portalLinks = {
     admin: process.env.NEXT_PUBLIC_ADMIN_PORTAL_URL || "https://adminportal-cleannft.netlify.app/",
-    users: process.env.NEXT_PUBLIC_USERS_PORTAL_URL || "https://userportal-cleannft.netlify.app/login",
+    users: process.env.NEXT_PUBLIC_USERS_PORTAL_URL || "https://userportal-cleannft.netlify.app/",
   };
 
   // MetaMask-style header: clean white background with gap from top
