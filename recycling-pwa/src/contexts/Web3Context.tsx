@@ -251,7 +251,14 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
       try {
         const provider = getProvider();
         const accounts = await provider.listAccounts();
-        const accountAddresses = accounts.map(acc => typeof acc === 'string' ? acc : acc.address);
+        // Convert accounts to string addresses
+        const accountAddresses: string[] = accounts.map(acc => {
+          if (typeof acc === 'string') {
+            return acc;
+          }
+          // If it's a JsonRpcSigner, get the address
+          return (acc as any).address || String(acc);
+        });
         
         if (accountAddresses && accountAddresses.length > 0) {
           const account = accountAddresses[0];

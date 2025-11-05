@@ -222,7 +222,7 @@ const NFTClaimScreen: React.FC = () => {
       }
 
       // Create NFT metadata
-      const _metadata: NFTMetadata = {
+      const metadata: NFTMetadata = {
         name: nft.name,
         description: nft.description,
         image: '',
@@ -236,9 +236,13 @@ const NFTClaimScreen: React.FC = () => {
 
       // TODO: Upload metadata to IPFS using PinataService
       // const pinataService = new PinataService();
-      // const ipfsResult = await pinataService.uploadMetadata(_metadata);
-      // const _tokenURI = `ipfs://${ipfsResult.hash}`;
-      const _tokenURI = `ipfs://placeholder-${Date.now()}`;
+      // const ipfsResult = await pinataService.uploadMetadata(metadata);
+      // const tokenURI = `ipfs://${ipfsResult.hash}`;
+      const tokenURI = `ipfs://placeholder-${Date.now()}`;
+      
+      // Log metadata for debugging (will be used when IPFS upload is implemented)
+      console.log('NFT Metadata:', metadata);
+      console.log('Token URI:', tokenURI);
 
       // TODO: Mint NFT on blockchain using contract
       // const tx = await contract!.mintNFT(account, tokenURI);
@@ -247,7 +251,6 @@ const NFTClaimScreen: React.FC = () => {
 
       // TODO: Implement actual NFT minting
       console.warn('NFT minting not fully implemented yet');
-      console.log('Token URI:', _tokenURI);
       
       if (result.tokenId) {
         // Update NFT status
