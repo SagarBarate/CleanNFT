@@ -12,24 +12,43 @@ export default function Home() {
   const [bottles, setBottles] = useState([1, 2, 3, 4, 5]); // 5 bottles in the bag
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [recycledCount, setRecycledCount] = useState(0);
+  const [draggedBottle, setDraggedBottle] = useState<number | null>(null);
+  const [recycledBottles, setRecycledBottles] = useState<number[]>([]); // Bottles that have been recycled and are in the bin
 
-  const recycleBottle = () => {
-    if (bottles.length > 0) {
-      // Remove a bottle
-      setBottles(prev => prev.slice(1));
+  const handleDragStart = (bottleId: number) => {
+    setDraggedBottle(bottleId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedBottle(null);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (draggedBottle !== null && bottles.includes(draggedBottle)) {
+      // Remove bottle from bag
+      setBottles(prev => prev.filter(id => id !== draggedBottle));
+      // Add to recycled bottles (will stick to bin)
+      setRecycledBottles(prev => [...prev, draggedBottle]);
       // Add points (10 points per bottle)
       setPoints(prev => prev + 10);
       setRecycledCount(prev => prev + 1);
       // Trigger celebration
       setIsCelebrating(true);
       setTimeout(() => setIsCelebrating(false), 2000);
+      setDraggedBottle(null);
     }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   const resetRecycling = () => {
     setBottles([1, 2, 3, 4, 5]);
     setPoints(0);
     setRecycledCount(0);
+    setRecycledBottles([]);
   };
   // Fallback content if landing.json fails to load
   const heroContent = {
@@ -131,21 +150,34 @@ export default function Home() {
                 {/* Bottle Container (Plastic Bag) */}
                 <div className="absolute top-20 right-8">
                   <div className="relative">
-                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-4 shadow-lg border-2 border-blue-300">
-                      <div className="text-xs text-blue-600 font-semibold mb-2 text-center">Plastic Bag</div>
-                      <div className="flex gap-2 flex-wrap w-32">
+                    {/* Plastic Bag - More realistic styling */}
+                    <div className="relative bg-gradient-to-br from-white/90 to-gray-100/90 rounded-lg p-4 shadow-xl border-2 border-gray-300 backdrop-blur-sm" style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.7) 100%)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+                      border: '2px solid rgba(150,150,150,0.3)',
+                    }}>
+                      {/* Bag handle */}
+                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-3 bg-gray-300/60 rounded-full border border-gray-400/40"></div>
+                      
+                      <div className="text-xs text-gray-600 font-semibold mb-2 text-center">Plastic Bag</div>
+                      <div className="flex gap-2 flex-wrap w-32 min-h-[80px]">
                         {bottles.length > 0 ? (
                           bottles.map((bottle, index) => (
                             <motion.div
                               key={bottle}
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className="w-8 h-12 bg-gradient-to-b from-green-400 to-green-600 rounded-t-lg rounded-b-sm shadow-md cursor-pointer hover:scale-110 transition-transform"
-                              onClick={recycleBottle}
-                              whileHover={{ scale: 1.2 }}
-                              whileTap={{ scale: 0.9 }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              drag
+                              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                              onDragStart={() => handleDragStart(bottle)}
+                              onDragEnd={handleDragEnd}
+                              whileDrag={{ scale: 1.3, zIndex: 50, cursor: 'grabbing' }}
+                              className="w-8 h-12 bg-gradient-to-b from-green-400 to-green-600 rounded-t-lg rounded-b-sm shadow-lg cursor-grab active:cursor-grabbing hover:scale-110 transition-transform relative"
+                              style={{ cursor: 'grab' }}
                             >
                               <div className="w-full h-2 bg-green-700 rounded-t-lg"></div>
+                              {/* Bottle cap */}
+                              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-1.5 bg-green-800 rounded-full"></div>
                             </motion.div>
                           ))
                         ) : (
