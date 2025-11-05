@@ -31,7 +31,6 @@ interface AuthorityPanelProps {
 }
 
 const AuthorityPanel: React.FC<AuthorityPanelProps> = ({ onStateChange }) => {
-  const [_contractState, setContractState] = useState<ContractState>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +64,6 @@ const AuthorityPanel: React.FC<AuthorityPanelProps> = ({ onStateChange }) => {
         operatorApproved: apiState.operatorApproved ?? blockchainApproved,
       };
       
-      setContractState(state);
       setPaused(state.paused ?? false);
       setOperatorApproved(state.operatorApproved ?? false);
     } catch (error) {
@@ -108,7 +106,6 @@ const AuthorityPanel: React.FC<AuthorityPanelProps> = ({ onStateChange }) => {
       const success = await cleannftApi.setPaused(!paused);
       if (success) {
         setPaused(!paused);
-        setContractState(prev => ({ ...prev, paused: !paused }));
         onStateChange?.();
       }
     } catch (error) {
@@ -131,7 +128,6 @@ const AuthorityPanel: React.FC<AuthorityPanelProps> = ({ onStateChange }) => {
       const success = await cleannftApi.setApprovalForAll(operatorAddress, !operatorApproved);
       if (success) {
         setOperatorApproved(!operatorApproved);
-        setContractState(prev => ({ ...prev, operatorApproved: !operatorApproved }));
         onStateChange?.();
       }
     } catch (error) {
