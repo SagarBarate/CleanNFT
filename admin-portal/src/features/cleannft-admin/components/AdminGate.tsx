@@ -61,7 +61,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const adminAddress = process.env.REACT_APP_ADMIN_PUBLIC_ADDRESS;
 
-  const checkConnection = async () => {
+  const checkConnection = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -114,7 +114,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         error: error instanceof Error ? error.message : 'Connection failed',
       }));
     }
-  };
+  }, [adminAddress]);
 
   const connect = async () => {
     try {
