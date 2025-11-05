@@ -196,34 +196,82 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Recycling Bin (VIN) */}
-                <div className="relative mt-32">
+                {/* Recycling Bin (VIN) - More realistic bin */}
+                <div 
+                  className="relative mt-32"
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                >
                   <motion.div
                     animate={bottles.length === 0 ? { scale: [1, 1.05, 1] } : {}}
                     transition={{ duration: 0.5 }}
                     className="relative"
                   >
-                    {/* Bin Body */}
-                    <div className="w-48 h-64 bg-gradient-to-b from-gray-300 to-gray-500 rounded-lg shadow-2xl border-4 border-gray-600 relative overflow-hidden">
-                      {/* Bin Top Opening */}
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-56 h-20 bg-gradient-to-b from-gray-400 to-gray-600 rounded-t-lg border-4 border-gray-600"></div>
+                    {/* Bin Body - More realistic styling */}
+                    <div className="w-52 h-72 bg-gradient-to-b from-gray-400 via-gray-500 to-gray-600 rounded-lg shadow-2xl border-4 border-gray-700 relative overflow-hidden" style={{
+                      background: 'linear-gradient(180deg, #9CA3AF 0%, #6B7280 50%, #4B5563 100%)',
+                      boxShadow: '0 20px 60px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2)',
+                      border: '4px solid #374151',
+                    }}>
+                      {/* Bin Top Opening - More realistic */}
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-60 h-24 bg-gradient-to-b from-gray-500 to-gray-600 rounded-t-lg border-4 border-gray-700 shadow-inner" style={{
+                        background: 'linear-gradient(180deg, #6B7280 0%, #4B5563 100%)',
+                        boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.3)',
+                      }}>
+                        {/* Opening rim */}
+                        <div className="absolute top-0 left-0 right-0 h-2 bg-gray-600 border-b-2 border-gray-700"></div>
+                      </div>
                       
                       {/* Recycling Symbol */}
-                      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-6xl">♻️</div>
+                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-7xl drop-shadow-lg">♻️</div>
                       
                       {/* Bin Label */}
-                      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-lg">
+                      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-white px-5 py-2 rounded-lg shadow-lg border-2 border-[#00A86B]">
                         <span className="text-sm font-bold text-[#00A86B]">RECYCLE</span>
                       </div>
 
                       {/* Drop Zone Indicator */}
                       {bottles.length > 0 && (
                         <motion.div
-                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          animate={{ opacity: [0.3, 0.6, 0.3] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
-                          className="absolute top-0 left-0 right-0 h-24 bg-green-200/30 rounded-t-lg pointer-events-none"
+                          className="absolute top-0 left-0 right-0 h-28 bg-green-300/20 rounded-t-lg pointer-events-none border-2 border-green-400/30"
                         />
                       )}
+
+                      {/* Recycled Bottles Stuck to Bin */}
+                      {recycledBottles.map((bottleId, index) => (
+                        <motion.div
+                          key={bottleId}
+                          initial={{ 
+                            scale: 0,
+                            x: 0,
+                            y: -100,
+                            rotate: -180,
+                          }}
+                          animate={{ 
+                            scale: 1,
+                            x: (index % 3) * 20 - 20, // Spread them out
+                            y: 40 + Math.floor(index / 3) * 25, // Stack them
+                            rotate: -90 + (index * 15), // Rotate them naturally
+                          }}
+                          transition={{ 
+                            duration: 0.8,
+                            type: "spring",
+                            stiffness: 200,
+                            damping: 15,
+                          }}
+                          className="absolute w-6 h-10 bg-gradient-to-b from-green-400 to-green-600 rounded-t-lg rounded-b-sm shadow-lg"
+                          style={{
+                            left: '50%',
+                            transformOrigin: 'center',
+                          }}
+                        >
+                          <div className="w-full h-1.5 bg-green-700 rounded-t-lg"></div>
+                          {/* Bottle cap */}
+                          <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-2.5 h-1 bg-green-800 rounded-full"></div>
+                        </motion.div>
+                      ))}
                     </div>
 
                     {/* Celebration Animation */}
@@ -278,7 +326,7 @@ export default function Home() {
                 <div className="absolute bottom-8 left-0 right-0 text-center">
                   <p className="text-sm text-gray-600">
                     {bottles.length > 0 
-                      ? `Click bottles to recycle! ${bottles.length} bottle${bottles.length > 1 ? 's' : ''} remaining`
+                      ? `Drag and drop bottles into the bin! ${bottles.length} bottle${bottles.length > 1 ? 's' : ''} remaining`
                       : `🎊 Great job! You recycled ${recycledCount} bottles and earned ${points} points!`
                     }
                   </p>
