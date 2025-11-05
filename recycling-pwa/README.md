@@ -1,6 +1,6 @@
-# 🌱 Recycling Rewards PWA
+# 👥 Users Portal - CleanNFT
 
-A Progressive Web App (PWA) for incentivizing recycling through gamification, badges, and NFT rewards.
+A Progressive Web App (PWA) for users to manage recycling activities, earn points, badges, and NFT rewards.
 
 ## 🚀 Features
 

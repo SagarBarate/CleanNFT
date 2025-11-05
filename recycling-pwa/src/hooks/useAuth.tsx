@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithCredentials = async (email: string, password: string, profileImage?: File | null) => {
+  const loginWithCredentials = async (email: string, password: string, _profileImage?: File | null) => {
     try {
       // Import the API service
       const { apiService } = await import('../services/apiService');

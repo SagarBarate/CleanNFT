@@ -5,6 +5,7 @@ import { wasteRoutes } from './waste.routes.js';
 import { pointsRoutes } from './points.routes.js';
 import { nftRoutes } from './nft.routes.js';
 import { adminRoutes } from './admin.routes.js';
+import { contactRoutes } from './contact.routes.js';
 
 /**
  * Main router that combines all route modules
@@ -19,6 +20,7 @@ export function createRouter(): Router {
   router.use('/api/v1', pointsRoutes);
   router.use('/api/v1', nftRoutes);
   router.use('/api/v1', adminRoutes);
+  router.use('/api/v1', contactRoutes);
 
   // Health check endpoint
   router.get('/health', (req, res) => {
@@ -43,6 +45,7 @@ export function createRouter(): Router {
         points: '/api/v1/points',
         nft: '/api/v1/nft',
         admin: '/api/v1/admin',
+        contact: '/api/v1/contact',
       },
       documentation: '/api/docs',
     });

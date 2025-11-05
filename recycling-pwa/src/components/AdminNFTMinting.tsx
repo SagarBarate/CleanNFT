@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import PinataService, { NFTMetadata } from '../services/pinataService';
+import PinataService from '../services/pinataService';
 import { NFTService } from '../services/nftService';
 import './AdminNFTMinting.css';
 
@@ -82,7 +82,7 @@ const AdminNFTMinting: React.FC = () => {
 
   const checkAdminStatus = async (service: NFTService) => {
     try {
-      const contractInfo = await service.getContractInfo();
+      await service.getContractInfo();
       // In a real app, you'd check if the current user is the contract owner
       // For now, we'll assume the connected user is admin
       setIsAdmin(true);
@@ -154,7 +154,7 @@ const AdminNFTMinting: React.FC = () => {
       setSuccess('');
 
       // Create NFT metadata with Pinata
-      const metadataResult = await pinataService.createNFTMetadata(
+      await pinataService.createNFTMetadata(
         mintingForm.name,
         mintingForm.description,
         mintingForm.imageFile!,

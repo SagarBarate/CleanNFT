@@ -1,8 +1,14 @@
-import { BookOpen, Zap, Shield, Code, HelpCircle } from "lucide-react";
+import { BookOpen, Zap, Shield, Code, HelpCircle, Lightbulb } from "lucide-react";
 import Link from "next/link";
 
 export default function DocsPage() {
   const sections = [
+    {
+      icon: Lightbulb,
+      title: "Inspiration",
+      description: "Discover the story behind CleanNFT - from DRS machines to blockchain rewards.",
+      href: "/docs/inspiration",
+    },
     {
       icon: BookOpen,
       title: "Basics",
@@ -76,7 +82,7 @@ export default function DocsPage() {
               badges, and NFT rewards on the Polygon blockchain. The system consists of multiple layers:
             </p>
             <ul className="list-disc list-inside space-y-2 mb-6">
-              <li><strong>Frontend Layer:</strong> Recycling PWA, Admin Portal, and Mobile App</li>
+              <li><strong>Frontend Layer:</strong> Users Portal, Admin Portal, and Mobile App</li>
               <li><strong>Backend Layer:</strong> Node.js API, IoT Simulation, and AWS Lambda</li>
               <li><strong>Blockchain Layer:</strong> Smart Contracts (RecyclingNFT, RecyclingBadge), IPFS Storage, and Polygon Network</li>
             </ul>

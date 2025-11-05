@@ -6,10 +6,6 @@ import {
   Chip,
   Alert,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material';
 import {
   AccountBalanceWallet as WalletIcon,

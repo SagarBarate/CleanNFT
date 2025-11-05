@@ -254,13 +254,17 @@ export class NFTService {
   /**
    * Wait for a transaction to be mined
    */
-  async waitForTransaction(tx: ethers.ContractTransactionResponse): Promise<ethers.ContractTransactionReceipt> {
+  async waitForTransaction(tx: ethers.ContractTransactionResponse): Promise<ethers.ContractTransactionReceipt | null> {
     if (!this.provider) {
       throw new Error('Service not initialized');
     }
 
     try {
-      return await tx.wait();
+      const receipt = await tx.wait();
+      if (!receipt) {
+        throw new Error('Transaction receipt is null');
+      }
+      return receipt;
     } catch (error) {
       console.error('Error waiting for transaction:', error);
       throw new Error('Transaction failed or timed out');

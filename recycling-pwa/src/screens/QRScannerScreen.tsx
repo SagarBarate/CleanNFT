@@ -16,14 +16,13 @@ import {
   QrCodeScanner as ScannerIcon,
   CameraAlt as CameraIcon,
   CheckCircle as CheckIcon,
-  Error as ErrorIcon,
 } from '@mui/icons-material';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useAuth } from '../hooks/useAuth';
 
 const QRScannerScreen: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
-  const [scannedData, setScannedData] = useState<string | null>(null);
+  const [_scannedData, setScannedData] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
   const [success, setSuccess] = useState(false);

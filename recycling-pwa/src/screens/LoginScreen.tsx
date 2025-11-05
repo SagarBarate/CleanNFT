@@ -7,11 +7,11 @@ import {
   Typography,
   Button,
   Container,
-  Paper,
   Grid,
   Alert,
   CircularProgress,
   TextField,
+  InputAdornment,
   Link,
   Avatar,
   Tabs,
@@ -146,7 +146,7 @@ const LoginScreen: React.FC = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     setError(null);
   };
@@ -345,7 +345,13 @@ const LoginScreen: React.FC = () => {
                         value={loginForm.email}
                         onChange={handleLoginFormChange}
                         required
-                        startIcon={<EmailIcon />}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <EmailIcon />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     </Grid>
                     
@@ -358,7 +364,13 @@ const LoginScreen: React.FC = () => {
                         value={loginForm.password}
                         onChange={handleLoginFormChange}
                         required
-                        startIcon={<LockIcon />}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <LockIcon />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     </Grid>
 

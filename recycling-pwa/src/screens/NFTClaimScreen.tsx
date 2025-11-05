@@ -21,7 +21,6 @@ import {
   IconButton,
 } from '@mui/material';
 import {
-  Token as NFTIcon,
   CheckCircle as CheckIcon,
   Lock as LockIcon,
   Star as StarIcon,
@@ -30,7 +29,8 @@ import {
   ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useWeb3 } from '../contexts/Web3Context';
-import nftService, { NFTMetadata } from '../services/nftService';
+import nftService from '../services/nftService';
+import { NFTMetadata } from '../services/pinataService';
 
 interface NFTToken {
   id: string;
@@ -223,26 +223,33 @@ const NFTClaimScreen: React.FC = () => {
       }
 
       // Create NFT metadata
-      const metadata: NFTMetadata = nftService.createRecyclingMetadata(
-        nft.name,
-        nft.description,
-        nft.rarity,
-        nft.category,
-        nft.pointsRequired,
-        Math.round(nft.progress * 100) // Mock bottles recycled
-      );
+      const metadata: NFTMetadata = {
+        name: nft.name,
+        description: nft.description,
+        image: '',
+        attributes: [
+          { trait_type: 'Rarity', value: nft.rarity },
+          { trait_type: 'Category', value: nft.category || 'recycling' },
+          { trait_type: 'Points Required', value: nft.pointsRequired },
+          { trait_type: 'Progress', value: Math.round(nft.progress * 100) },
+        ],
+      };
 
-      // Upload metadata to IPFS
-      const tokenURI = await nftService.uploadToIPFS(metadata);
+      // TODO: Upload metadata to IPFS using PinataService
+      // const pinataService = new PinataService();
+      // const ipfsResult = await pinataService.uploadMetadata(metadata);
+      // const tokenURI = `ipfs://${ipfsResult.hash}`;
+      const tokenURI = `ipfs://placeholder-${Date.now()}`;
 
-      // Mint NFT on blockchain
-      const result = await nftService.mintNFT(
-        contract!,
-        await contract!.runner as any,
-        tokenURI
-      );
+      // TODO: Mint NFT on blockchain using contract
+      // const tx = await contract!.mintNFT(account, tokenURI);
+      // const receipt = await tx.wait();
+      const result = { tokenId: 0, transactionHash: '0x', success: false };
 
-      if (result.success && result.tokenId) {
+      // TODO: Implement actual NFT minting
+      console.warn('NFT minting not fully implemented yet');
+      
+      if (result.tokenId) {
         // Update NFT status
         setNftTokens(prev => 
           prev.map(n => 

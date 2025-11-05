@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NFTService, NFTInfo, ContractInfo } from '../services/nftService';
-import { BLOCKCHAIN_CONFIG } from '../config/blockchain';
+import { NFTService, ContractInfo } from '../services/nftService';
 import './NFTClaiming.css';
 
 interface AvailableNFT {
@@ -168,7 +167,7 @@ const NFTClaiming: React.FC = () => {
     }
   };
 
-  const getNetworkName = (chainId: string | number) => {
+  const _getNetworkName = (chainId: string | number) => {
     const chainIdNum = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId;
     switch (chainIdNum) {
       case 80001:

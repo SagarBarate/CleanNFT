@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Box,
   Container,
@@ -18,9 +18,11 @@ import {
   Chat,
 } from '@mui/icons-material';
 import AdminDemoPreview from './admin/AdminDemoPreview';
+import ContactDialog from './ContactDialog';
 
 const AdminLanding: React.FC = () => {
   const demoSectionRef = useRef<HTMLDivElement>(null);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
 
   const scrollToDemo = () => {
     demoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -348,6 +350,7 @@ const AdminLanding: React.FC = () => {
               variant="contained"
               size="large"
               startIcon={<Chat />}
+              onClick={() => setContactDialogOpen(true)}
               sx={{
                 bgcolor: 'white',
                 color: '#00A86B',
@@ -383,6 +386,12 @@ const AdminLanding: React.FC = () => {
           reserved.
         </Typography>
       </Box>
+
+      {/* Contact Dialog */}
+      <ContactDialog
+        open={contactDialogOpen}
+        onClose={() => setContactDialogOpen(false)}
+      />
     </Box>
   );
 };

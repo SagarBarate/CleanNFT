@@ -8,12 +8,12 @@ import {
   Button,
   Container,
   TextField,
+  InputAdornment,
   Grid,
   Alert,
   CircularProgress,
   Link,
   Avatar,
-  Paper,
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -192,7 +192,13 @@ const SignupScreen: React.FC = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    startIcon={<PersonIcon />}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
 
@@ -206,7 +212,13 @@ const SignupScreen: React.FC = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    startIcon={<EmailIcon />}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <EmailIcon />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
 
@@ -232,7 +244,13 @@ const SignupScreen: React.FC = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    startIcon={<LockIcon />}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LockIcon />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
 
@@ -246,7 +264,13 @@ const SignupScreen: React.FC = () => {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     required
-                    startIcon={<LockIcon />}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LockIcon />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
 

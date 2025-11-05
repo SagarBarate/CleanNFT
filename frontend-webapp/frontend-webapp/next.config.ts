@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { resolve } from "path";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -15,11 +14,15 @@ const nextConfig: NextConfig = {
   },
   // Transpile framer-motion to fix ES module compatibility issues
   transpilePackages: ["framer-motion", "motion-dom", "motion-utils"],
-  // Turbopack configuration (Next.js 16 uses Turbopack by default)
-  turbopack: {
-    // Set root to fix workspace detection issue with multiple lockfiles
-    // This points to the current project directory
-    root: process.cwd(),
+  // Webpack configuration to handle ES modules properly
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    return config;
   },
 };
 

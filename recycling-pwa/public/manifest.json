@@ -1,7 +1,7 @@
 {
-  "name": "Recycling Rewards App",
-  "short_name": "RecycleApp",
-  "description": "Earn points, badges, and NFTs by recycling bottles and contributing to a sustainable future",
+  "name": "Users Portal - CleanNFT",
+  "short_name": "Users Portal",
+  "description": "User portal for managing recycling activities, earning points, badges, and NFTs",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#4CAF50",

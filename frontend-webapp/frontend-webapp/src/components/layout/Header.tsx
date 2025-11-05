@@ -10,33 +10,37 @@ import { cn } from "@/lib/utils/cn";
 export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
+  const [lastScrollY, setLastScrollY] = React.useState(0);
   const pathname = usePathname();
 
   React.useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      
+      // Show shadow when scrolled
+      setIsScrolled(currentScrollY > 20);
+      
+      // Elegant hide/show behavior
+      if (currentScrollY <= 100) {
+        // Always show at top
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - hide header elegantly
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header elegantly
+        setIsVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", handleScroll);
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  React.useEffect(() => {
-    // Check for dark mode preference
-    const checkDarkMode = () => {
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDarkMode(isDark);
-    };
-    
-    checkDarkMode();
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    mediaQuery.addEventListener("change", checkDarkMode);
-    
-    return () => mediaQuery.removeEventListener("change", checkDarkMode);
-  }, []);
+  }, [lastScrollY]);
 
   const navItems = [
-    { label: "Products", href: "/products", hasDropdown: true },
     { label: "Company", href: "/about", hasDropdown: true },
     { label: "Blog", href: "/docs", hasDropdown: true },
   ];
@@ -44,40 +48,46 @@ export function Header() {
   // Portal links - these should point to the actual admin and customer portals
   const portalLinks = {
     admin: process.env.NEXT_PUBLIC_ADMIN_PORTAL_URL || "http://localhost:3000",
-    recycling: process.env.NEXT_PUBLIC_RECYCLING_PWA_URL || "http://localhost:5173",
+    users: process.env.NEXT_PUBLIC_USERS_PORTAL_URL || "http://localhost:5173",
   };
 
-  // Theme-aware colors
-  const headerBg = isScrolled
-    ? isDarkMode
-      ? "bg-[#0B0F0E]/95 backdrop-blur-md shadow-lg"
-      : "bg-white/95 backdrop-blur-md shadow-lg"
-    : isDarkMode
-      ? "bg-transparent"
-      : "bg-white/80 backdrop-blur-sm";
-
-  const textColor = isDarkMode ? "text-white" : "text-[#171717]";
-  const textColorHover = isDarkMode ? "hover:text-[#A3FFB0]" : "hover:text-[#00A86B]";
-  const borderColor = isDarkMode ? "border-white/10" : "border-gray-200";
+  // MetaMask-style header: clean white background with gap from top
+  const headerBg = "bg-white";
+  const textColor = "text-[#171717]";
+  const textColorHover = "hover:text-[#171717]/80";
+  const borderColor = "border-gray-200";
 
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        headerBg
+        "fixed left-0 right-0 z-50 transition-all duration-500 ease-in-out",
+        isVisible 
+          ? "top-4 translate-y-0 opacity-100" 
+          : "-top-full translate-y-[-100%] opacity-0 pointer-events-none"
       )}
     >
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <span className={cn("text-2xl font-bold", textColor)}>
-              Clean<span className="text-[#00A86B]">NFT</span>
+      <nav className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div 
+          className={cn(
+            "flex h-16 items-center justify-between bg-white rounded-lg px-6 transition-all duration-300",
+            isScrolled && "shadow-lg border border-gray-100"
+          )}
+          style={{
+            boxShadow: isScrolled 
+              ? "0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)" 
+              : "0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
+          }}
+        >
+          {/* Logo - MetaMask style (stacked) with green NFT */}
+          <Link href="/" className="flex items-center">
+            <span className={cn("text-xl font-bold tracking-tight flex flex-col leading-tight")}>
+              <span className="text-2xl text-[#171717]">Clean</span>
+              <span className="text-2xl text-[#00A86B]">NFT</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - MetaMask style center positioning */}
+          <div className="hidden md:flex items-center space-x-6 flex-1 justify-center">
             {navItems.map((item) => (
               <div key={item.href} className="relative group">
                 <Link
@@ -85,7 +95,7 @@ export function Header() {
                   className={cn(
                     "flex items-center space-x-1 text-sm font-medium transition-colors",
                     pathname === item.href
-                      ? "text-[#00A86B]"
+                      ? "text-[#171717]"
                       : cn(textColor, textColorHover)
                   )}
                 >
@@ -102,7 +112,7 @@ export function Header() {
               className={cn(
                 "text-sm font-medium transition-colors",
                 pathname === "/nfts"
-                  ? "text-[#00A86B]"
+                  ? "text-[#171717]"
                   : cn(textColor, textColorHover)
               )}
             >
@@ -111,12 +121,12 @@ export function Header() {
 
             {/* Portal Links */}
             <a
-              href={portalLinks.recycling}
+              href={portalLinks.users}
               target="_blank"
               rel="noopener noreferrer"
               className={cn("text-sm font-medium transition-colors", textColor, textColorHover)}
             >
-              Recycling PWA
+              Users Portal
             </a>
             <a
               href={portalLinks.admin}
@@ -126,23 +136,15 @@ export function Header() {
             >
               Admin Portal
             </a>
+          </div>
 
-            <Link href="/contact">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className={cn(
-                  isDarkMode
-                    ? "text-white border-white/20 hover:bg-white hover:text-[#0B0F0E]"
-                    : "text-[#171717] border-gray-300 hover:bg-[#171717] hover:text-white"
-                )}
-              >
-                Contact
-              </Button>
-            </Link>
-
+          {/* CTA Button - MetaMask style black button on right */}
+          <div className="hidden md:flex items-center">
             <Link href="/nfts">
-              <Button size="sm" className="bg-gradient-to-r from-[#00A86B] to-[#A3FFB0] text-white">
+              <Button 
+                size="sm" 
+                className="bg-[#171717] text-white hover:bg-[#171717]/90 rounded-md px-4 py-2 text-sm font-medium"
+              >
                 Explore NFTs
               </Button>
             </Link>
@@ -193,13 +195,13 @@ export function Header() {
               Gallery
             </Link>
             <a
-              href={portalLinks.recycling}
+              href={portalLinks.users}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
               className={cn("block text-sm font-medium transition-colors", textColor, textColorHover)}
             >
-              Recycling PWA
+              Users Portal
             </a>
             <a
               href={portalLinks.admin}
@@ -211,24 +213,10 @@ export function Header() {
               Admin Portal
             </a>
             <div className="pt-4 space-y-2">
-              <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "w-full",
-                    isDarkMode
-                      ? "text-white border-white/20 hover:bg-white hover:text-[#0B0F0E]"
-                      : "text-[#171717] border-gray-300 hover:bg-[#171717] hover:text-white"
-                  )}
-                >
-                  Contact
-                </Button>
-              </Link>
               <Link href="/nfts" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button
                   size="sm"
-                  className="w-full bg-gradient-to-r from-[#00A86B] to-[#A3FFB0] text-white"
+                  className="w-full bg-[#171717] text-white hover:bg-[#171717]/90"
                 >
                   Explore NFTs
                 </Button>

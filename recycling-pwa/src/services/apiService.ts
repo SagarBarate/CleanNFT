@@ -177,11 +177,25 @@ class ApiService {
     const formData = new FormData();
     formData.append('profileImage', imageFile);
 
+    const authHeaders = this.getAuthHeaders();
+    const headers: HeadersInit = new Headers();
+    if (authHeaders instanceof Headers) {
+      authHeaders.forEach((value, key) => {
+        headers.set(key, value);
+      });
+    } else if (Array.isArray(authHeaders)) {
+      authHeaders.forEach(([key, value]) => {
+        headers.set(key, value);
+      });
+    } else {
+      Object.entries(authHeaders).forEach(([key, value]) => {
+        headers.set(key, value);
+      });
+    }
+
     const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-image`, {
       method: 'POST',
-      headers: {
-        Authorization: this.getAuthHeaders().Authorization!,
-      },
+      headers,
       body: formData,
     });
 

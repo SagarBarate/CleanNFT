@@ -182,7 +182,7 @@ export function useWallet(): UseWalletReturn {
           const isMumbai = isMumbaiNetwork(chainId);
 
           setState({
-            address: account as string,
+            address: typeof account === 'string' ? account : String(account),
             isConnected: true,
             chainId,
             isMumbai,

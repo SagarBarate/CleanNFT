@@ -15,7 +15,6 @@ import {
   Snackbar,
 } from '@mui/material';
 import {
-  EmojiEvents as BadgeIcon,
   CheckCircle as CheckIcon,
   Lock as LockIcon,
   Star as StarIcon,

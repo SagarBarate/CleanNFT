@@ -68,10 +68,10 @@ export const BLOCKCHAIN_CONFIG = {
 
   // App Configuration
   APP: {
-    NAME: 'Recycling Rewards',
+    NAME: 'Users Portal - CleanNFT',
     VERSION: '1.0.0',
-    DESCRIPTION: 'Earn NFTs for recycling achievements',
-    WEBSITE: 'https://recycling-rewards-app.com',
+    DESCRIPTION: 'User portal for managing recycling activities and earning NFTs',
+    WEBSITE: 'https://cleannft.com',
   }
 };
 

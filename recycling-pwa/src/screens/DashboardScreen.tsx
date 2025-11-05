@@ -10,9 +10,6 @@ import {
   LinearProgress,
   Avatar,
   Chip,
-  Paper,
-  IconButton,
-  Tooltip,
 } from '@mui/material';
 import {
   TrendingUp as TrendingIcon,
@@ -20,7 +17,6 @@ import {
   Token as NFTIcon,
   QrCodeScanner as ScannerIcon,
   Add as AddIcon,
-  Remove as RemoveIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
 import RecycleIcon from '../components/RecycleIcon';
