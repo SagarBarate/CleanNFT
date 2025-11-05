@@ -250,10 +250,11 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({
 
       try {
         const provider = getProvider();
-        const accounts: string[] = await provider.listAccounts();
+        const accounts = await provider.listAccounts();
+        const accountAddresses = accounts.map(acc => typeof acc === 'string' ? acc : acc.address);
         
-        if (accounts && accounts.length > 0) {
-          const account = accounts[0];
+        if (accountAddresses && accountAddresses.length > 0) {
+          const account = accountAddresses[0];
           const network = await provider.getNetwork();
           const chainId = network.chainId.toString();
 

@@ -138,7 +138,11 @@ const NFTClaiming: React.FC = () => {
 
       // Wait for confirmation
       const receipt = await nftService.waitForTransaction(tx);
-      setSuccess(`NFT claimed successfully! Transaction confirmed in block ${receipt.blockNumber}`);
+      if (receipt) {
+        setSuccess(`NFT claimed successfully! Transaction confirmed in block ${receipt.blockNumber}`);
+      } else {
+        setSuccess(`NFT claimed successfully! Transaction submitted.`);
+      }
 
       // Update user claim status
       setUserClaimStatus(true);
@@ -167,19 +171,19 @@ const NFTClaiming: React.FC = () => {
     }
   };
 
-  const _getNetworkName = (chainId: string | number) => {
-    const chainIdNum = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId;
-    switch (chainIdNum) {
-      case 80001:
-        return 'Mumbai Testnet';
-      case 137:
-        return 'Polygon Mainnet';
-      case 1:
-        return 'Ethereum Mainnet';
-      default:
-        return `Chain ID: ${chainIdNum}`;
-    }
-  };
+  // const _getNetworkName = (chainId: string | number) => {
+  //   const chainIdNum = typeof chainId === 'string' ? parseInt(chainId, 16) : chainId;
+  //   switch (chainIdNum) {
+  //     case 80001:
+  //       return 'Mumbai Testnet';
+  //     case 137:
+  //       return 'Polygon Mainnet';
+  //     case 1:
+  //       return 'Ethereum Mainnet';
+  //     default:
+  //       return `Chain ID: ${chainIdNum}`;
+  //   }
+  // };
 
   if (!isConnected) {
     return (

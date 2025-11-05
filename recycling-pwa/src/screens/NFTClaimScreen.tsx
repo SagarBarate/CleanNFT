@@ -29,7 +29,6 @@ import {
   ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useWeb3 } from '../contexts/Web3Context';
-import nftService from '../services/nftService';
 import { NFTMetadata } from '../services/pinataService';
 
 interface NFTToken {
@@ -71,7 +70,7 @@ const NFTClaimScreen: React.FC = () => {
   const navigate = useNavigate();
   
   // Web3 context
-  const { isConnected, chainId, contract, contractAddress } = useWeb3();
+  const { isConnected, chainId, contract: _contract, contractAddress } = useWeb3();
 
   useEffect(() => {
     loadNFTTokens();
@@ -223,7 +222,7 @@ const NFTClaimScreen: React.FC = () => {
       }
 
       // Create NFT metadata
-      const metadata: NFTMetadata = {
+      const _metadata: NFTMetadata = {
         name: nft.name,
         description: nft.description,
         image: '',
@@ -237,9 +236,9 @@ const NFTClaimScreen: React.FC = () => {
 
       // TODO: Upload metadata to IPFS using PinataService
       // const pinataService = new PinataService();
-      // const ipfsResult = await pinataService.uploadMetadata(metadata);
-      // const tokenURI = `ipfs://${ipfsResult.hash}`;
-      const tokenURI = `ipfs://placeholder-${Date.now()}`;
+      // const ipfsResult = await pinataService.uploadMetadata(_metadata);
+      // const _tokenURI = `ipfs://${ipfsResult.hash}`;
+      const _tokenURI = `ipfs://placeholder-${Date.now()}`;
 
       // TODO: Mint NFT on blockchain using contract
       // const tx = await contract!.mintNFT(account, tokenURI);
@@ -248,6 +247,7 @@ const NFTClaimScreen: React.FC = () => {
 
       // TODO: Implement actual NFT minting
       console.warn('NFT minting not fully implemented yet');
+      console.log('Token URI:', _tokenURI);
       
       if (result.tokenId) {
         // Update NFT status
@@ -270,7 +270,7 @@ const NFTClaimScreen: React.FC = () => {
           severity: 'success',
         });
       } else {
-        throw new Error(result.error || 'Minting failed');
+        throw new Error('Minting failed - tokenId is 0');
       }
     } catch (error) {
       console.error('Minting error:', error);
